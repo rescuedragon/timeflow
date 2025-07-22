@@ -66,7 +66,6 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
     ? selectedProject.subprojects
         .filter(sub => sub.toLowerCase().includes(subprojectSearchQuery.toLowerCase()))
         .sort((a, b) => {
-          // Sort by frequency if available, otherwise keep original order
           const aFreq = subprojectFrequency[selectedProject.id]?.[a] || 0;
           const bFreq = subprojectFrequency[selectedProject.id]?.[b] || 0;
           return bFreq - aFreq;
@@ -243,78 +242,79 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
         </div>
           
         {/* Standard Project Dropdown */}
-        {!selectedProject && (
-          <div className={`dropdown ${showProjectDropdown ? 'show' : ''}`}>
-            {filteredProjects.map((project, index) => (
-              <div
-                key={project.id}
-                className={`dropdown-item ${index === projectDropdownIndex ? 'highlighted' : ''}`}
-                onClick={() => {
-                  onProjectSelect(project);
-                  setProjectSearchQuery(project.name);
-                  setShowProjectDropdown(false);
-                  setProjectDropdownIndex(-1);
-                  // Auto-focus on subproject search
-                  setTimeout(() => {
-                    setSubprojectSearchQuery('');
-                    setShowSubprojectDropdown(true);
-                  }, 100);
-                }}
-              >
-                <div className="project-item-content">
-                  <div className="project-name">{project.name}</div>
+        {!selectedProject && showProjectDropdown && (
+          <div className="absolute mt-2 w-[calc(100%-2.5rem)] bg-white/95 backdrop-blur-xl rounded-xl shadow-xl z-10 border border-white/30 overflow-hidden">
+            <div className="max-h-80 overflow-y-auto">
+              {filteredProjects.map((project, index) => (
+                <div
+                  key={project.id}
+                  className={`px-4 py-3 flex justify-between items-center cursor-pointer transition-all duration-150 ${
+                    index === projectDropdownIndex 
+                      ? 'bg-purple-50/60' 
+                      : 'hover:bg-slate-50/80'
+                  }`}
+                  onClick={() => {
+                    onProjectSelect(project);
+                    setProjectSearchQuery(project.name);
+                    setShowProjectDropdown(false);
+                    setProjectDropdownIndex(-1);
+                  }}
+                >
+                  <div className="flex flex-col">
+                    <div className="text-sm font-medium text-slate-800">{project.name}</div>
+                    <div className="text-xs text-slate-500 mt-1">{project.subprojects.length} tasks</div>
+                  </div>
+                  <div className="text-xs font-medium text-slate-400">
+                    {project.category}
+                  </div>
                 </div>
-                <div className="project-count">{project.subprojects.length} tasks</div>
-              </div>
-            ))}
-            {filteredProjects.length === 0 && (
-              <div className="dropdown-item">
-                <div className="project-item-content">
-                  <div className="project-name text-slate-500">No projects found</div>
+              ))}
+              {filteredProjects.length === 0 && (
+                <div className="px-4 py-6 text-center">
+                  <div className="text-sm text-slate-500">No projects found</div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
         {/* Subproject Dropdown */}
-        {selectedProject && !selectedSubproject && (
-          <div className={`subproject-dropdown ${showSubprojectDropdown ? 'show' : ''}`}>
-            {filteredSubprojects.map((subproject, index) => {
-              // Get frequency count for this subproject
-              const frequency = subprojectFrequency[selectedProject.id]?.[subproject] || 0;
-              
-              return (
-                <div
-                  key={index}
-                  className={`dropdown-item ${index === subprojectDropdownIndex ? 'highlighted' : ''}`}
-                  onClick={() => {
-                    onSubprojectSelect(subproject);
-                    setSubprojectSearchQuery(subproject);
-                    setShowSubprojectDropdown(false);
-                    setSubprojectDropdownIndex(-1);
-                  }}
-                >
-                  <div className="project-item-content">
-                    <div className="project-name text-sm">{subproject}</div>
-                  </div>
-                  {frequency > 0 && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
+        {selectedProject && !selectedSubproject && showSubprojectDropdown && (
+          <div className="absolute mt-2 w-[calc(100%-2.5rem)] bg-white/95 backdrop-blur-xl rounded-xl shadow-xl z-10 border border-white/30 overflow-hidden">
+            <div className="max-h-80 overflow-y-auto">
+              {filteredSubprojects.map((subproject, index) => {
+                const frequency = subprojectFrequency[selectedProject.id]?.[subproject] || 0;
+                
+                return (
+                  <div
+                    key={index}
+                    className={`px-4 py-3 flex justify-between items-center cursor-pointer transition-all duration-150 ${
+                      index === subprojectDropdownIndex 
+                        ? 'bg-purple-50/60' 
+                        : 'hover:bg-slate-50/80'
+                    }`}
+                    onClick={() => {
+                      onSubprojectSelect(subproject);
+                      setSubprojectSearchQuery(subproject);
+                      setShowSubprojectDropdown(false);
+                      setSubprojectDropdownIndex(-1);
+                    }}
+                  >
+                    <div className="text-sm font-medium text-slate-800">{subproject}</div>
+                    {frequency > 0 && (
+                      <div className="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
                         {frequency} uses
-                      </span>
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              {filteredSubprojects.length === 0 && (
+                <div className="px-4 py-6 text-center">
+                  <div className="text-sm text-slate-500">No tasks found</div>
                 </div>
-              );
-            })}
-            {filteredSubprojects.length === 0 && (
-              <div className="dropdown-item">
-                <div className="project-item-content">
-                  <div className="project-name text-slate-500 text-sm">No tasks found</div>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -323,7 +323,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
       <div className="h-full flex flex-col">
         {/* Show selection summary when a project is selected */}
         {selectedProject && (
-          <div className="bg-gradient-to-br from-purple-50/60 via-white/80 to-blue-50/60 border border-purple-100/30 rounded-2xl shadow-sm p-6 mx-6 mt-6 mb-6 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-purple-50/60 via-white/80 to-blue-50/60 border border-purple-100/30 rounded-2xl shadow-sm p-6 mt-6 mb-6 backdrop-blur-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-slate-700 tracking-tight">Selected Project</h3>
               <Badge variant="outline" className="bg-purple-100/60 text-purple-700 border-purple-200/40 px-3 py-1 rounded-full font-medium text-xs">
@@ -340,7 +340,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
         )}
 
         {selectedSubproject && (
-          <div className="bg-gradient-to-br from-emerald-50/60 via-white/80 to-green-50/60 border border-emerald-100/30 rounded-2xl shadow-sm p-6 mx-6 mt-4 mb-6 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-emerald-50/60 via-white/80 to-green-50/60 border border-emerald-100/30 rounded-2xl shadow-sm p-6 mt-4 mb-6 backdrop-blur-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-slate-700 tracking-tight">Selected Task</h3>
               <Badge variant="outline" className="bg-emerald-100/60 text-emerald-700 border-emerald-200/40 px-3 py-1 rounded-full font-medium text-xs">
@@ -353,7 +353,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
         {/* Show Frequently Used Projects when no project is selected and activeTab is 'frequent' */}
         {!selectedProject && activeTab === 'frequent' && (
-          <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mx-6 mb-6">
+          <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mb-6">
             <div className="h-full overflow-y-auto">
               {frequentlyUsedProjects.length > 0 ? (
                 <div className="divide-y divide-slate-100/40">
@@ -363,23 +363,22 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                       className="group"
                     >
                       <button
-                        className="w-full px-6 py-5 text-left hover:bg-slate-50/60 active:bg-slate-100/40 transition-all duration-200"
+                        className="w-full px-6 py-5 text-left hover:bg-slate-50/60 active:bg-slate-100/40 transition-all duration-200 flex items-center justify-between"
                         onClick={() => {
-                          // Toggle expansion of this project to show subprojects
                           const expandedProjectId = expandedProject === project.id ? null : project.id;
                           setExpandedProject(expandedProjectId);
                         }}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="font-medium text-base text-slate-700 group-hover:text-purple-600 transition-colors duration-200">{project.name}</div>
-                          <div className="text-slate-300 group-hover:text-purple-400 transition-colors duration-200">
-                            <ChevronRight className={`w-4 h-4 transform transition-transform duration-200 ${expandedProject === project.id ? 'rotate-90' : ''}`} />
-                          </div>
-                        </div>
+                        <div className="font-medium text-base text-slate-700 group-hover:text-purple-600 transition-colors duration-200">{project.name}</div>
+                        <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                          expandedProject === project.id ? 'rotate-90' : ''
+                        }`} />
                       </button>
                       
                       {/* Subprojects list - shown when expanded */}
-                      <div className={`overflow-hidden transition-all duration-200 ${expandedProject === project.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                      <div className={`overflow-hidden transition-all duration-200 ${
+                        expandedProject === project.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                      }`}>
                         <div className="bg-slate-50/30 border-t border-slate-100/30">
                           {project.subprojects
                             .sort((a, b) => {
@@ -390,7 +389,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                             .map((subproject, idx) => (
                               <button
                                 key={idx}
-                                className="w-full px-6 py-4 pl-12 text-left hover:bg-purple-50/40 active:bg-purple-100/30 transition-all duration-200 border-b border-slate-100/20 last:border-b-0 group/subtask"
+                                className="w-full px-6 py-4 pl-12 text-left hover:bg-purple-50/40 active:bg-purple-100/30 transition-all duration-200 border-b border-slate-100/20 last:border-b-0 group/subtask flex justify-between items-center"
                                 onClick={() => {
                                   onProjectSelect(project);
                                   onSubprojectSelect(subproject);
@@ -399,6 +398,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                                 }}
                               >
                                 <div className="text-sm text-slate-600 group-hover/subtask:text-purple-600 font-normal transition-colors duration-200">{subproject}</div>
+                                <div className="text-xs text-slate-400">
+                                  {subprojectFrequency[project.id]?.[subproject] || 0} uses
+                                </div>
                               </button>
                             ))
                           }
@@ -422,7 +424,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
         {/* Show Quick Start Combinations when no project is selected and activeTab is 'quick' */}
         {!selectedProject && activeTab === 'quick' && (
-          <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mx-6 mb-6">
+          <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mb-6">
             <div className="h-full overflow-y-auto">
               {quickStartCombinations.length > 0 ? (
                 <div className="divide-y divide-slate-100/40">
@@ -436,10 +438,16 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                         onClick={() => onQuickStart(item)}
                       >
                         <div className="space-y-2">
-                          <div className="font-medium text-base text-slate-700 group-hover:text-purple-600 transition-colors duration-200">{item.projectName}</div>
-                          <div className="text-sm text-purple-500 font-normal">{item.subproject}</div>
-                          <div className="flex justify-end">
+                          <div className="flex items-start">
+                            <div className="flex-1">
+                              <div className="font-medium text-base text-slate-700 group-hover:text-purple-600 transition-colors duration-200">{item.projectName}</div>
+                              <div className="text-sm text-purple-500 font-normal mt-1">{item.subproject}</div>
+                            </div>
                             <div className="text-xs text-slate-400 bg-slate-100/50 px-2 py-1 rounded-full">{item.lastUsed}</div>
+                          </div>
+                          <div className="flex items-center text-xs text-slate-500">
+                            <Clock className="w-3.5 h-3.5 mr-1" />
+                            Used {item.frequency} times
                           </div>
                         </div>
                       </button>
@@ -461,13 +469,17 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
         {/* Show instructions when a project is selected but no subproject */}
         {selectedProject && !selectedSubproject && (
-          <div className="flex-1 bg-gradient-to-br from-slate-50/60 via-white/80 to-slate-100/60 border border-slate-200/30 rounded-2xl shadow-sm p-8 backdrop-blur-sm mx-6 mb-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-slate-100/60 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Clock className="w-8 h-8 text-slate-400" />
+          <div className="flex-1 bg-gradient-to-br from-slate-50/60 via-white/80 to-slate-100/60 border border-slate-200/30 rounded-2xl shadow-sm p-8 backdrop-blur-sm mb-6 flex items-center justify-center">
+            <div className="text-center max-w-xs">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                <div className="bg-gradient-to-br from-purple-400 to-purple-600 w-8 h-8 rounded-lg flex items-center justify-center shadow">
+                  <ChevronRight className="w-4 h-4 text-white" />
+                </div>
               </div>
               <h3 className="text-lg font-medium mb-3 text-slate-700 tracking-tight">Select a Task</h3>
-              <p className="text-sm text-slate-500 leading-relaxed">Choose a specific task from <span className="font-medium text-purple-600">{selectedProject.name}</span> to begin tracking time</p>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                Choose a specific task from <span className="font-medium text-purple-600">{selectedProject.name}</span> to begin tracking time
+              </p>
             </div>
           </div>
         )}
@@ -476,4 +488,4 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   );
 };
 
-export default ProjectSelector; 
+export default ProjectSelector;
