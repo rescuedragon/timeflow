@@ -1,0 +1,1562 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Premium Apple-like Design System for Timesheet App */
+
+@layer base {
+  :root {
+    /* Core Colors - Premium Purple Palette */
+    --background: 248 250 252;
+    --foreground: 241 245 249;
+
+    --card: 255 255 255;
+    --card-foreground: 71 85 105;
+
+    --popover: 255 255 255;
+    --popover-foreground: 71 85 105;
+
+    --primary: 139 92 246;
+    --primary-foreground: 255 255 255;
+
+    --secondary: 248 250 252;
+    --secondary-foreground: 100 116 139;
+
+    --muted: 241 245 249;
+    --muted-foreground: 148 163 184;
+
+    --accent: 167 139 250;
+    --accent-foreground: 255 255 255;
+
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+
+    --border: 226 232 240;
+    --input: 241 245 249;
+    --ring: 139 92 246;
+
+    /* Premium Design Tokens */
+    --primary-glow: 196 181 253;
+    --success: 34 197 94;
+    --warning: 251 191 36;
+    --info: 59 130 246;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(263 85% 70%) 0%, hsl(262 83% 58%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(263 85% 70% / 0.1) 0%, hsl(262 83% 58% / 0.05) 100%);
+    --gradient-surface: linear-gradient(145deg, hsl(255 255 255 / 0.9) 0%, hsl(255 255 255 / 0.6) 100%);
+    --gradient-glass: linear-gradient(145deg, hsl(255 255 255 / 0.2) 0%, hsl(255 255 255 / 0.1) 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
+    --shadow-medium: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -2px hsl(0 0% 0% / 0.05);
+    --shadow-large: 0 20px 25px -5px hsl(0 0% 0% / 0.1), 0 10px 10px -5px hsl(0 0% 0% / 0.04);
+    --shadow-glow: 0 0 20px hsl(139 92 246 / 0.3);
+
+    /* Animations */
+    --animation-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --animation-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
+    
+    --radius: 1rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-slate-50 to-slate-100 text-slate-700;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    background: var(--gradient-secondary);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif !important;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-rendering: optimizeLegibility;
+  }
+
+  .font-mono {
+    font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace !important;
+    font-feature-settings: 'tnum';
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Font Classes for Better Control */
+  .font-display {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif !important;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-rendering: optimizeLegibility;
+  }
+
+  .font-system {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+@layer components {
+  /* Glass Morphism Effects */
+  .glass {
+    background: var(--gradient-glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsl(255 255 255 / 0.2);
+  }
+
+  .surface {
+    background: var(--gradient-surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .elevated {
+    box-shadow: var(--shadow-medium);
+  }
+
+  .floating {
+    box-shadow: var(--shadow-large);
+  }
+
+  /* Animations */
+  .animate-fade-up {
+    animation: fade-up 0.5s var(--animation-smooth);
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s var(--animation-bounce);
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.4s var(--animation-smooth);
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s infinite;
+  }
+
+  /* Timer Effects */
+  .flip-number {
+    transition: transform 0.6s var(--animation-smooth);
+  }
+
+  .flip-number.updating {
+    transform: rotateX(180deg);
+  }
+
+  /* Progress Bar Animation */
+  .progress-fill {
+    transition: width 0.8s var(--animation-smooth);
+  }
+
+  /* Hover Effects */
+  .hover-lift {
+    transition: all 0.3s var(--animation-smooth);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-large);
+  }
+
+  /* Tab Transitions */
+  .tab-content {
+    animation: tab-fade-in 0.3s var(--animation-smooth);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(139 92 246 / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px hsl(139 92 246 / 0.6);
+  }
+}
+
+@keyframes tab-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Task-specific enhancements */
+@layer components {
+  .task-card {
+    transition: all 0.3s var(--animation-smooth);
+    border: 1px solid hsl(226 232 240 / 0.5);
+  }
+
+  .task-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px -5px hsl(0 0% 0% / 0.1), 0 4px 6px -2px hsl(0 0% 0% / 0.05);
+    border-color: hsl(226 232 240 / 0.8);
+  }
+
+  .priority-badge {
+    transition: all 0.2s var(--animation-smooth);
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+  }
+
+  .priority-badge:hover {
+    transform: scale(1.05);
+  }
+
+  .current-task-glow {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .current-task-glow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsl(255 255 255 / 0.4), transparent);
+    animation: shimmer 3s infinite;
+  }
+
+  .status-indicator {
+    transition: all 0.2s var(--animation-smooth);
+  }
+
+  .status-indicator:hover {
+    transform: scale(1.1);
+  }
+
+  .overdue-pulse {
+    animation: overdue-pulse 2s infinite;
+  }
+
+  .completed-fade {
+    opacity: 0.7;
+    transition: opacity 0.3s var(--animation-smooth);
+  }
+
+  .completed-fade:hover {
+    opacity: 0.9;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes overdue-pulse {
+  0%, 100% {
+    background-color: hsl(0 84% 60% / 0.1);
+  }
+  50% {
+    background-color: hsl(0 84% 60% / 0.2);
+  }
+}
+
+/* Scrollbar styling */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: hsl(226 232 240 / 0.3);
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: hsl(226 232 240 / 0.6);
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: hsl(226 232 240 / 0.8);
+}
+
+/* Enhanced Dropdown System with Smooth Animations */
+@layer components {
+  /* Main Dropdown Container */
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    right: 0;
+    border-radius: 24px;
+    box-shadow: 0 32px 64px rgba(0,0,0,0.12), 0 8px 32px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.08);
+    overflow: hidden;
+    z-index: 1000;
+    opacity: 0;
+    transform: scale(0.94) translateY(-16px);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    backdrop-filter: blur(40px);
+    background: rgba(255, 255, 255, 0.95);
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .dropdown.show {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: all;
+  }
+
+  /* Individual Dropdown Items */
+  .dropdown-item {
+    padding: 20px 28px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border-left: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+    transform: translateY(12px);
+    will-change: transform, background-color;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .dropdown-item:last-child {
+    border-bottom: none;
+  }
+
+  /* Staggered animation delays */
+  .dropdown.show .dropdown-item:nth-child(1) { animation-delay: 0.06s; }
+  .dropdown.show .dropdown-item:nth-child(2) { animation-delay: 0.12s; }
+  .dropdown.show .dropdown-item:nth-child(3) { animation-delay: 0.18s; }
+  .dropdown.show .dropdown-item:nth-child(4) { animation-delay: 0.24s; }
+  .dropdown.show .dropdown-item:nth-child(5) { animation-delay: 0.30s; }
+  .dropdown.show .dropdown-item:nth-child(6) { animation-delay: 0.36s; }
+  .dropdown.show .dropdown-item:nth-child(7) { animation-delay: 0.42s; }
+  .dropdown.show .dropdown-item:nth-child(8) { animation-delay: 0.48s; }
+  .dropdown.show .dropdown-item:nth-child(9) { animation-delay: 0.54s; }
+  .dropdown.show .dropdown-item:nth-child(10) { animation-delay: 0.60s; }
+  .dropdown.show .dropdown-item:nth-child(11) { animation-delay: 0.66s; }
+  .dropdown.show .dropdown-item:nth-child(12) { animation-delay: 0.72s; }
+  .dropdown.show .dropdown-item:nth-child(13) { animation-delay: 0.78s; }
+  .dropdown.show .dropdown-item:nth-child(14) { animation-delay: 0.84s; }
+  .dropdown.show .dropdown-item:nth-child(15) { animation-delay: 0.90s; }
+
+  /* Hover Effects */
+  .dropdown-item:hover,
+  .dropdown-item.highlighted {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(167, 139, 250, 0.05) 100%);
+    transform: translateX(8px) scale(1.02);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
+    border-radius: 12px;
+    margin: 2px 4px;
+    padding: 18px 24px;
+    border-left: 3px solid rgb(139, 92, 246);
+  }
+
+  /* Project Selector Alternative Style */
+  .dropdown-ps {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    z-index: 1000;
+    opacity: 0;
+    transform: scale(0.95) translateY(-8px);
+    transform-origin: top center;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    backdrop-filter: blur(20px);
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+
+  .dropdown-ps.show {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: all;
+  }
+
+  /* Subproject Dropdown */
+  .subproject-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 20px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(139, 92, 246, 0.1);
+    overflow: hidden;
+    z-index: 1001;
+    opacity: 0;
+    transform: scale(0.96) translateY(-12px);
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    backdrop-filter: blur(30px);
+    max-height: 350px;
+    overflow-y: auto;
+  }
+
+  .subproject-dropdown.show {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: all;
+  }
+
+  /* Project Item Content */
+  .project-item-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+  }
+
+  .project-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: rgb(51, 65, 85);
+    margin-bottom: 4px;
+  }
+
+  .project-category {
+    font-size: 12px;
+    color: rgb(100, 116, 139);
+    background: rgba(139, 92, 246, 0.1);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+
+  .project-count {
+    font-size: 11px;
+    color: rgb(148, 163, 184);
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 6px;
+    border-radius: 6px;
+    margin-left: auto;
+  }
+
+  /* Search Input Focus States */
+  .search-input-focused {
+    border-color: rgb(139, 92, 246) !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important;
+  }
+
+  /* Custom Scrollbar for Dropdowns */
+  .dropdown::-webkit-scrollbar,
+  .dropdown-ps::-webkit-scrollbar,
+  .subproject-dropdown::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .dropdown::-webkit-scrollbar-track,
+  .dropdown-ps::-webkit-scrollbar-track,
+  .subproject-dropdown::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+  }
+
+  .dropdown::-webkit-scrollbar-thumb,
+  .dropdown-ps::-webkit-scrollbar-thumb,
+  .subproject-dropdown::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 3px;
+  }
+
+  .dropdown::-webkit-scrollbar-thumb:hover,
+  .dropdown-ps::-webkit-scrollbar-thumb:hover,
+  .subproject-dropdown::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.5);
+  }
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading Animation for Dropdown Items */
+@keyframes shimmerLoad {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.dropdown-item-loading {
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+  background-size: 200px 100%;
+  animation: shimmerLoad 1.5s infinite;
+}
+
+/* Premium Black Glossy Clock Styles */
+.analog-clock-container {
+  position: relative;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+/* Outer shadow for depth - very subtle */
+.analog-clock-container::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: #222;
+  border-radius: 50%;
+  z-index: -1;
+}
+
+/* Subtle glossy reflection effect */
+.clock-reflection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 40%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Very subtle highlight */
+.clock-highlight {
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 20%;
+  height: 10%;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  transform: rotate(-45deg);
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Modern Time Zone Card Styles */
+.timezone-card {
+  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 50%, #6b21a8 100%);
+  padding: 2rem 2.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.3), 0 8px 10px -6px rgba(124, 58, 237, 0.2);
+  position: relative;
+  overflow: hidden;
+  height: 160px; /* Fixed height to match original container */
+  display: flex;
+  align-items: center;
+  height: 160px; /* Fixed height to match original container */
+  display: flex;
+  align-items: center;
+}
+
+/* Add subtle gradient overlay for depth */
+.timezone-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top left, rgba(168, 85, 247, 0.4) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Add subtle shine effect */
+.timezone-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  background: linear-gradient(45deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0) 100%);
+  transform: rotate(35deg);
+  pointer-events: none;
+}
+
+.timezone-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.timezone-divider {
+  width: 1px;
+  height: 80%;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.3), transparent);
+  position: absolute;
+  right: -2rem;
+}
+
+.clock-ring {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.location-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.time-display {
+  font-family: 'Space Mono', 'Roboto Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: white;
+}
+
+.date-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.date-weekday {
+  font-family: 'Inter', 'Poppins', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.date-full {
+  font-family: 'Inter', 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  opacity: 0.9;
+  line-height: 1.2;
+}
+
+/* Modern Stopwatch Styles */
+.stopwatch-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Timer Display */
+.timer-display {
+  font-family: 'Roboto Mono', 'Space Mono', monospace;
+  font-size: 7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #222;
+  position: relative;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid rgba(139, 92, 246, 0.15);
+}
+
+/* Subtle purple glow */
+.timer-display::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 25%;
+  right: 25%;
+  height: 3px;
+  background: #8b5cf6;
+  border-radius: 3px;
+}
+
+/* Status Label */
+.status-label {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+/* Primary Button */
+.timer-button {
+  border-radius: 9999px;
+  background: #8b5cf6;
+  color: white;
+  font-weight: 600;
+  padding: 0.875rem 3rem;
+  font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+  border: none;
+  cursor: pointer;
+}
+
+.timer-button:hover {
+  background: #7c3aed;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3);
+}
+
+.timer-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+}
+
+.timer-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Secondary Button */
+.timer-button-secondary {
+  border-radius: 9999px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-weight: 600;
+  padding: 0.875rem 2rem;
+  font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.timer-button-secondary:hover {
+  background: #e2e8f0;
+  transform: translateY(-2px);
+}
+
+.timer-button-secondary:active {
+  transform: translateY(1px);
+}
+
+/* Progress Ring Animation */
+.progress-ring-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110%;
+  height: 110%;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.progress-ring {
+  stroke: rgba(139, 92, 246, 0.15);
+  stroke-linecap: round;
+  transform-origin: center;
+  animation: progress-rotate 60s linear infinite;
+  filter: drop-shadow(0 0 2px rgba(139, 92, 246, 0.3));
+}
+
+@keyframes progress-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Additional modern stopwatch styles */
+.stopwatch-display::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Modern Stopwatch Styles - Visual Only */
+.stopwatch-container {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 2rem;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 5px 15px -10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  position: relative;
+}
+
+.stopwatch-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+}
+
+.stopwatch-time {
+  font-family: 'Space Mono', 'Roboto Mono', monospace;
+  font-size: 7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #8b5cf6;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8), 0 2px 10px rgba(139, 92, 246, 0.2);
+  position: relative;
+}
+
+.stopwatch-label {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.stopwatch-btn {
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.stopwatch-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+}
+
+.stopwatch-btn:active {
+  transform: translateY(1px);
+}
+
+.stopwatch-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.stopwatch-btn-alt {
+  background: white;
+  border: 2px solid #8b5cf6;
+  color: #8b5cf6;
+}
+
+.stopwatch-btn-alt:hover {
+  background: #f5f3ff;
+}
+
+/* Progress Ring Animation */
+.progress-ring-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110%;
+  height: 110%;
+  pointer-events: none;
+}
+
+.progress-ring {
+  stroke: rgba(139, 92, 246, 0.1);
+  stroke-linecap: round;
+  transform-origin: center;
+  animation: progress-rotate 60s linear infinite;
+}
+
+@keyframes progress-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Additional Stopwatch Enhancements */
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+.stopwatch-card {
+  transition: all 0.3s ease;
+}
+
+.stopwatch-card:hover {
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15), 0 10px 20px -10px rgba(0, 0, 0, 0.1);
+}
+
+.stopwatch-display {
+  position: relative;
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%);
+}
+
+/* Subtle glow effect for the time display */
+.stopwatch-display::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0) 70%);
+  border-radius: 1.5rem;
+  z-index: -1;
+  opacity: 0.7;
+  filter: blur(8px);
+}
+
+/* Enhanced button styles */
+.stopwatch-button {
+  min-width: 140px;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Specific styles for the Start button */
+.stopwatch-button:not(.bg-white) {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+}
+
+.stopwatch-button:not(.bg-white):hover {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
+}
+
+/* E
+nhanced Stopwatch Styles */
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+/* Stopwatch Time Display */
+.stopwatch-time-display {
+  position: relative;
+  padding: 1.5rem 2rem;
+  border-radius: 1.5rem;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(249,250,251,0.8) 100%);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8);
+  display: inline-block;
+  margin: 0 auto;
+}
+
+.stopwatch-time-display::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border-radius: 2rem;
+  z-index: -1;
+}
+
+/* Animation for the running state */
+@keyframes pulse-subtle {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.animate-pulse {
+  animation: pulse-subtle 2s infinite ease-in-out;
+}
+
+/* Button hover effects */
+button.rounded-full {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button.rounded-full:hover {
+  transform: translateY(-2px);
+}
+
+button.rounded-full:active {
+  transform: translateY(1px);
+}
+
+/* Enhance the font for the timer */
+.font-mono {
+  font-family: 'Space Mono', monospace !important;
+  letter-spacing: 0.05em;
+}
+
+/* P
+roject List UI Styles */
+.project-list {
+  transition: all 0.3s ease;
+}
+
+.project-item {
+  transition: all 0.3s ease;
+}
+
+.project-item button {
+  position: relative;
+  overflow: hidden;
+}
+
+.project-item button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, rgba(139, 92, 246, 0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.project-item button:hover::after {
+  transform: translateX(0);
+}
+
+/* Tab Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Project Expansion Animation */
+.project-expanded {
+  max-height: 500px;
+  transition: max-height 0.5s ease;
+}
+
+.project-collapsed {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+}
+
+/* Tab Transition */
+.tab-container {
+  position: relative;
+}
+
+.tab-panel {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tab-panel.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.tab-panel.inactive {
+  opacity: 0;
+  transform: translateX(20px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Project List UI Styles */
+.project-list {
+  transition: all 0.3s ease;
+}
+
+.project-item {
+  transition: all 0.3s ease;
+}
+
+.project-item button {
+  position: relative;
+  overflow: hidden;
+}
+
+.project-item button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, rgba(139, 92, 246, 0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.project-item button:hover::after {
+  transform: translateX(0);
+}
+
+/* Tab Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Project Expansion Animation */
+.project-expanded {
+  max-height: 500px;
+  transition: max-height 0.5s ease;
+}
+
+.project-collapsed {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+}
+
+/* Tab Transition */
+.tab-container {
+  position: relative;
+}
+
+.tab-panel {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.tab-panel.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.tab-panel.inactive {
+  opacity: 0;
+  transform: translateX(20px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Subprojects container */
+.subprojects-container {
+  background-color: rgba(249, 250, 251, 0.5);
+  overflow: hidden;
+}
+
+/* Tab button styles */
+button.flex-1 {
+  position: relative;
+  overflow: hidden;
+}
+
+button.flex-1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+button.flex-1:hover::after {
+  background-color: rgba(139, 92, 246, 0.3);
+}/* Co
+untry Flags */
+.flag-india {
+  background: linear-gradient(to bottom, 
+    #FF9933 33.33%, /* Saffron */
+    #FFFFFF 33.33%, 66.66%, /* White */
+    #138808 66.66% /* Green */
+  );
+  position: relative;
+}
+
+.flag-india::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24%;
+  height: 24%;
+  border-radius: 50%;
+  background-color: #000080; /* Navy Blue */
+}
+
+.flag-uk {
+  background: #00247D; /* Blue background */
+  position: relative;
+  overflow: hidden;
+}
+
+.flag-uk::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(to bottom right, transparent calc(50% - 2px), #FFFFFF calc(50% - 2px), #FFFFFF calc(50% + 2px), transparent calc(50% + 2px)),
+    linear-gradient(to bottom left, transparent calc(50% - 2px), #FFFFFF calc(50% - 2px), #FFFFFF calc(50% + 2px), transparent calc(50% + 2px));
+}
+
+.flag-uk::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    linear-gradient(to bottom, transparent calc(50% - 10%), #FFFFFF calc(50% - 10%), #FFFFFF calc(50% + 10%), transparent calc(50% + 10%)),
+    linear-gradient(to right, transparent calc(50% - 10%), #FFFFFF calc(50% - 10%), #FFFFFF calc(50% + 10%), transparent calc(50% + 10%)),
+    linear-gradient(to bottom, transparent calc(50% - 12%), #CF142B calc(50% - 12%), #CF142B calc(50% + 12%), transparent calc(50% + 12%)),
+    linear-gradient(to right, transparent calc(50% - 12%), #CF142B calc(50% - 12%), #CF142B calc(50% + 12%), transparent calc(50% + 12%));
+}
+
+.flag-usa {
+  background: linear-gradient(
+    to bottom,
+    #B22234 7.7%, /* Red */
+    #FFFFFF 7.7%, 15.4%, /* White */
+    #B22234 15.4%, 23.1%, /* Red */
+    #FFFFFF 23.1%, 30.8%, /* White */
+    #B22234 30.8%, 38.5%, /* Red */
+    #FFFFFF 38.5%, 46.2%, /* White */
+    #B22234 46.2%, 53.9%, /* Red */
+    #FFFFFF 53.9%, 61.6%, /* White */
+    #B22234 61.6%, 69.3%, /* Red */
+    #FFFFFF 69.3%, 77%, /* White */
+    #B22234 77%, 84.7%, /* Red */
+    #FFFFFF 84.7%, 92.4%, /* White */
+    #B22234 92.4% /* Red */
+  );
+  position: relative;
+}
+
+.flag-usa::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 53.9%;
+  background-color: #3C3B6E; /* Blue */
+}/*
+ Country Flag Styles */
+.flag-india {
+  background: linear-gradient(to bottom, 
+    #FF9933 0%, #FF9933 33%, 
+    #FFFFFF 33%, #FFFFFF 66%, 
+    #138808 66%, #138808 100%);
+  position: relative;
+}
+
+.flag-india::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24%;
+  height: 24%;
+  border-radius: 50%;
+  background: #000080;
+  border: 1px solid #000080;
+}
+
+.flag-uk {
+  background: #00247D;
+  position: relative;
+}
+
+.flag-uk::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(to bottom right, transparent calc(50% - 2px), #FFFFFF calc(50% - 2px), #FFFFFF calc(50% + 2px), transparent calc(50% + 2px)),
+    linear-gradient(to bottom left, transparent calc(50% - 2px), #FFFFFF calc(50% - 2px), #FFFFFF calc(50% + 2px), transparent calc(50% + 2px));
+}
+
+.flag-uk::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(to bottom, transparent calc(50% - 1px), #FFFFFF calc(50% - 1px), #FFFFFF calc(50% + 1px), transparent calc(50% + 1px)),
+    linear-gradient(to right, transparent calc(50% - 1px), #FFFFFF calc(50% - 1px), #FFFFFF calc(50% + 1px), transparent calc(50% + 1px));
+}
+
+.flag-usa {
+  background: linear-gradient(
+    to bottom,
+    #B22234 0%, #B22234 7.7%,
+    #FFFFFF 7.7%, #FFFFFF 15.4%,
+    #B22234 15.4%, #B22234 23.1%,
+    #FFFFFF 23.1%, #FFFFFF 30.8%,
+    #B22234 30.8%, #B22234 38.5%,
+    #FFFFFF 38.5%, #FFFFFF 46.2%,
+    #B22234 46.2%, #B22234 53.9%,
+    #FFFFFF 53.9%, #FFFFFF 61.6%,
+    #B22234 61.6%, #B22234 69.3%,
+    #FFFFFF 69.3%, #FFFFFF 77%,
+    #B22234 77%, #B22234 84.7%,
+    #FFFFFF 84.7%, #FFFFFF 92.4%,
+    #B22234 92.4%, #B22234 100%
+  );
+  position: relative;
+}
+
+.flag-usa::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 53.85%;
+  background: #3C3B6E;
+}/* Count
+ry Flags */
+.flag-india {
+  background: linear-gradient(to bottom, 
+    #FF9933 0%, #FF9933 33%, 
+    #FFFFFF 33%, #FFFFFF 66%, 
+    #138808 66%, #138808 100%);
+  position: relative;
+}
+
+.flag-india::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24%;
+  height: 24%;
+  border-radius: 50%;
+  border: 1px solid #000080;
+  background-color: #FFFFFF;
+}
+
+.flag-uk {
+  background-color: #00247D;
+  position: relative;
+  overflow: hidden;
+}
+
+.flag-uk::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(to bottom, transparent 45%, #FFFFFF 45%, #FFFFFF 55%, transparent 55%),
+    linear-gradient(to right, transparent 45%, #FFFFFF 45%, #FFFFFF 55%, transparent 55%),
+    linear-gradient(135deg, transparent 42%, #FFFFFF 42%, #FFFFFF 58%, transparent 58%),
+    linear-gradient(45deg, transparent 42%, #FFFFFF 42%, #FFFFFF 58%, transparent 58%),
+    linear-gradient(135deg, transparent 44%, #C8102E 44%, #C8102E 56%, transparent 56%),
+    linear-gradient(45deg, transparent 44%, #C8102E 44%, #C8102E 56%, transparent 56%);
+}
+
+.flag-usa {
+  background-color: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+}
+
+.flag-usa::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 53.85%;
+  background-color: #3C3B6E;
+}
+
+.flag-usa::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    #B22234 0%,
+    #B22234 7.69%,
+    #FFFFFF 7.69%,
+    #FFFFFF 15.38%
+  );
+  background-size: 100% 100%;
+}
