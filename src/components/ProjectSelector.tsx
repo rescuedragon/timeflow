@@ -193,7 +193,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
           <div
             ref={searchContainerRef}
             className={`w-full flex items-center bg-white border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${isSearchFocused ? 'ring-2 ring-blue-500 border-blue-500' : ''
-              } ${(showProjectDropdown || showSubprojectDropdown) ? 'rounded-t-2xl' : 'rounded-2xl'}`}
+              } ${(showProjectDropdown || showSubprojectDropdown) ? 'rounded-t-2xl border-b-0' : 'rounded-2xl'}`}
             style={{ transition: 'box-shadow 0.2s ease, border-color 0.2s ease, border-radius 0.2s ease' }}
             onClick={() => {
               if (inputRef.current) {
