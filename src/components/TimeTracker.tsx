@@ -127,8 +127,19 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
   const quickStartCombinations = quickStartItems
     .sort((a, b) => b.frequency - a.frequency);
 
-  // Check if timer is active and both project and subproject are selected
+  // Show timer active state in InfoBar only when timer is actually running
   const isTimerActive = isRunning && selectedProject && selectedSubproject;
+  
+  // Debug effect to log when isTimerActive changes
+  useEffect(() => {
+    console.log('isTimerActive changed:', { 
+      isTimerActive, 
+      isRunning, 
+      isPaused, 
+      hasProject: !!selectedProject, 
+      hasSubproject: !!selectedSubproject 
+    });
+  }, [isTimerActive, isRunning, isPaused, selectedProject, selectedSubproject]);
 
   // Handle quick start selection and auto-start timer
   const handleQuickStart = (quickStartItem: QuickStartItem) => {
@@ -202,11 +213,20 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
 
     onTimeLogged(entry);
     
-    // Reset timer
+    // Reset timer but keep project and subproject selection
     setIsRunning(false);
     setIsPaused(false);
     setTime(0);
     setStartTime(null);
+    
+    // Log state for debugging
+    console.log('Timer stopped, new state:', { 
+      isRunning: false, 
+      isPaused: false, 
+      time: 0,
+      selectedProject: selectedProject?.name,
+      selectedSubproject
+    });
   };
 
   return (

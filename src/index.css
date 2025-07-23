@@ -552,10 +552,10 @@
     margin-left: auto;
   }
 
-  /* Search Input Focus States */
+  /* Search Input Focus States - Disabled to prevent blue highlighting */
   .search-input-focused {
-    border-color: rgb(139, 92, 246) !important;
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
   }
 
   /* Custom Scrollbar for Dropdowns */
@@ -1752,8 +1752,8 @@ ium InfoBar Styles */
 
 .apple-search-input:focus {
   background: rgba(255, 255, 255, 0.98);
-  border-color: rgba(138, 92, 246, 0.3);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-color: transparent;
+  box-shadow: none;
   outline: none;
 }
 
@@ -1767,7 +1767,7 @@ ium InfoBar Styles */
 }
 
 .apple-search-input:focus + .apple-search-icon {
-  color: #8a5cf6;
+  color: #a1a1a1; /* Keep the same color as unfocused */
 }
 
 .apple-search-dropdown {
