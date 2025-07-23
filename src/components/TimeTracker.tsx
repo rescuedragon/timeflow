@@ -126,7 +126,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
   // Get quick start items sorted by frequency (for display in the UI, not in dropdown)
   const quickStartCombinations = quickStartItems
     .sort((a, b) => b.frequency - a.frequency);
-
+    
   // Show timer active state in InfoBar only when timer is actually running
   const isTimerActive = isRunning && selectedProject && selectedSubproject;
   
@@ -137,9 +137,10 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
       isRunning, 
       isPaused, 
       hasProject: !!selectedProject, 
-      hasSubproject: !!selectedSubproject 
+      hasSubproject: !!selectedSubproject,
+      time: time
     });
-  }, [isTimerActive, isRunning, isPaused, selectedProject, selectedSubproject]);
+  }, [isTimerActive, isRunning, isPaused, selectedProject, selectedSubproject, time]);
 
   // Handle quick start selection and auto-start timer
   const handleQuickStart = (quickStartItem: QuickStartItem) => {
@@ -160,11 +161,23 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isRunning && !isPaused) {
+      console.log('Starting timer interval');
       interval = setInterval(() => {
-        setTime(prevTime => prevTime + 1);
+        setTime(prevTime => {
+          const newTime = prevTime + 1;
+          console.log('Timer tick:', newTime, 'seconds');
+          return newTime;
+        });
       }, 1000);
+    } else {
+      console.log('Timer stopped or paused:', { isRunning, isPaused });
     }
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) {
+        console.log('Clearing timer interval');
+        clearInterval(interval);
+      }
+    };
   }, [isRunning, isPaused]);
 
   const formatTime = (seconds: number) => {
@@ -175,6 +188,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
   };
 
   const handleStart = () => {
+    console.log('handleStart called');
     if (!selectedProject || !selectedSubproject) {
       alert('Please select a project and subproject first');
       return;
@@ -183,6 +197,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
       alert('A timer is already running. Please stop the current timer first.');
       return;
     }
+    console.log('Starting timer');
     setIsRunning(true);
     setIsPaused(false);
     setStartTime(new Date());
