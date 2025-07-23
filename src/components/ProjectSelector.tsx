@@ -61,21 +61,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Timer for auto-unselect
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    if (selectedProject && selectedSubproject) {
-      timer = setTimeout(() => {
-        onProjectSelect(null);
-        onSubprojectSelect('');
-      }, 10000);
-    }
-
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [selectedProject, selectedSubproject, onProjectSelect, onSubprojectSelect]);
+  // Removed auto-unselect timer - project and subproject selection should persist
 
   // Handle click outside to remove focus
   useEffect(() => {
