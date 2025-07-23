@@ -243,19 +243,21 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
 
     onTimeLogged(entry);
     
-    // Reset timer but keep project and subproject selection
+    // Reset timer and deselect project and subproject
     setIsRunning(false);
     setIsPaused(false);
     setTime(0);
     setStartTime(null);
+    setSelectedProject(null);
+    setSelectedSubproject('');
     
     // Log state for debugging
     console.log('Timer stopped, new state:', { 
       isRunning: false, 
       isPaused: false, 
       time: 0,
-      selectedProject: selectedProject?.name,
-      selectedSubproject
+      selectedProject: null,
+      selectedSubproject: ''
     });
   };
 
