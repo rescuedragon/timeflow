@@ -266,13 +266,14 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
           {/* Standard Project Dropdown */}
           {!selectedProject && showProjectDropdown && (
-            <div className="absolute top-full left-6 right-6 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
-              <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-2">
+            <div className="absolute top-full left-6 right-6 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 z-50 animate-dropdown-enter overflow-hidden">
+              <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-3">
                 {filteredProjects.map((project, index) => (
                   <div
                     key={project.id}
-                    className={`px-4 py-2 cursor-pointer hover:bg-gray-50 ${index === projectDropdownIndex ? 'bg-gray-50' : ''
-                      }`}
+                    className={`px-4 py-3 cursor-pointer transition-all duration-200 ease-out hover:bg-purple-50/80 hover:scale-[1.02] hover:shadow-sm mx-2 rounded-xl ${index === projectDropdownIndex ? 'bg-purple-100/60 shadow-sm scale-[1.02]' : ''
+                      } animate-dropdown-item`}
+                    style={{ animationDelay: `${index * 50}ms` }}
                     onClick={() => {
                       onProjectSelect(project);
                       setProjectSearchQuery(project.name);
@@ -280,12 +281,12 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                       setProjectDropdownIndex(-1);
                     }}
                   >
-                    <div className="text-sm font-medium text-slate-800">{project.name}</div>
+                    <div className="text-sm font-medium text-slate-800 tracking-tight">{project.name}</div>
                   </div>
                 ))}
                 {filteredProjects.length === 0 && (
-                  <div className="px-4 py-6 text-center">
-                    <div className="text-sm text-slate-500">No projects found</div>
+                  <div className="px-4 py-8 text-center animate-dropdown-item">
+                    <div className="text-sm text-slate-500 font-medium">No projects found</div>
                   </div>
                 )}
               </div>
@@ -294,14 +295,15 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
           {/* Subproject Dropdown */}
           {selectedProject && !selectedSubproject && showSubprojectDropdown && (
-            <div className="absolute top-full left-6 right-6 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
-              <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-2">
+            <div className="absolute top-full left-6 right-6 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 z-50 animate-dropdown-enter overflow-hidden">
+              <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-3">
                 {filteredSubprojects.map((subproject, index) => {
                   return (
                     <div
                       key={index}
-                      className={`px-4 py-2 cursor-pointer hover:bg-gray-50 ${index === subprojectDropdownIndex ? 'bg-gray-50' : ''
-                        }`}
+                      className={`px-4 py-3 cursor-pointer transition-all duration-200 ease-out hover:bg-emerald-50/80 hover:scale-[1.02] hover:shadow-sm mx-2 rounded-xl ${index === subprojectDropdownIndex ? 'bg-emerald-100/60 shadow-sm scale-[1.02]' : ''
+                        } animate-dropdown-item`}
+                      style={{ animationDelay: `${index * 50}ms` }}
                       onClick={() => {
                         onSubprojectSelect(subproject);
                         setSubprojectSearchQuery(subproject);
@@ -309,13 +311,13 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                         setSubprojectDropdownIndex(-1);
                       }}
                     >
-                      <div className="text-sm font-medium text-slate-800">{subproject}</div>
+                      <div className="text-sm font-medium text-slate-800 tracking-tight">{subproject}</div>
                     </div>
                   );
                 })}
                 {filteredSubprojects.length === 0 && (
-                  <div className="px-4 py-6 text-center">
-                    <div className="text-sm text-slate-500">No tasks found</div>
+                  <div className="px-4 py-8 text-center animate-dropdown-item">
+                    <div className="text-sm text-slate-500 font-medium">No tasks found</div>
                   </div>
                 )}
               </div>
