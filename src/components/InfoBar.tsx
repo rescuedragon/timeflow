@@ -55,104 +55,83 @@ const InfoBar: React.FC<InfoBarProps> = ({
   return (
     <div className="w-full">
       <div className="max-w-7xl mx-auto px-8">
-        <div className="timezone-card">
+        <div className="timezone-card relative premium-infobar">
           {isTimerActive ? (
             <>
-              {/* Currently Tracking Section - Left Side */}
-              <div className="flex-1 flex flex-col justify-center px-8 py-6">
-                {/* Status Header */}
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-4 h-4 rounded-full bg-white animate-pulse"></div>
-                  <span className="text-white font-bold text-2xl tracking-wider">CURRENTLY TRACKING</span>
+              {/* Pulsing white dot in extreme top left with enhanced animation */}
+              <div className="absolute top-[22px] left-4 w-2 h-2 rounded-full bg-white animate-premium-pulse"></div>
+              
+              {/* Project Info Section - Left Side (80% width) */}
+              <div className="flex-[0.8] flex items-center justify-evenly px-8 py-6">
+                {/* Project Info */}
+                <div className="flex flex-col animate-fade-in animate-fade-in-1">
+                  <div className="text-white/70 text-xs font-normal uppercase tracking-[0.1em] mb-2" 
+                       style={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}>
+                    PROJECT
+                  </div>
+                  <div className="text-white font-bold text-2xl leading-tight" 
+                       style={{ fontFamily: "'Inter', 'Poppins', sans-serif", letterSpacing: "-0.02em" }}>
+                    {selectedProject?.name}
+                  </div>
                 </div>
-                {/* Project Info Section */}
-                <div className="flex items-center gap-12">
-                  {/* Project Info */}
-                  <div className="flex flex-col">
-                    <div className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-2">PROJECT</div>
-                    <div className="text-white font-bold text-2xl leading-tight">{selectedProject?.name}</div>
+                
+                {/* Subproject Info */}
+                <div className="flex flex-col animate-fade-in animate-fade-in-2">
+                  <div className="text-white/70 text-xs font-normal uppercase tracking-[0.1em] mb-2" 
+                       style={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}>
+                    TASK
                   </div>
-                  {/* Subproject Info */}
-                  <div className="flex flex-col">
-                    <div className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-2">TASK</div>
-                    <div className="text-white font-bold text-2xl leading-tight">{selectedSubproject}</div>
+                  <div className="text-white font-bold text-2xl leading-tight" 
+                       style={{ fontFamily: "'Inter', 'Poppins', sans-serif", letterSpacing: "-0.02em" }}>
+                    {selectedSubproject}
                   </div>
-                  {/* Timer Hours */}
-                  <div className="flex flex-col">
-                    <div className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-2">HOURS</div>
-                    <div className="text-white font-bold text-3xl font-mono leading-tight">{getDecimalHours(time)}</div>
+                </div>
+                
+                {/* Timer Hours */}
+                <div className="flex flex-col animate-fade-in animate-fade-in-3">
+                  <div className="text-white/70 text-xs font-normal uppercase tracking-[0.1em] mb-2" 
+                       style={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}>
+                    HOURS
+                  </div>
+                  <div className="text-white font-bold text-3xl leading-tight hours-value" 
+                       style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    {getDecimalHours(time)}
                   </div>
                 </div>
               </div>
-              {/* World Times - Right Side */}
-              <div className="flex-1 flex items-center justify-center px-8 py-6">
-                <div className="flex items-center gap-8">
-                  {/* India */}
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="relative">
-                      <div className="w-16 h-16 rounded-full bg-black flex items-center justify-center shadow-lg">
-                        <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
-                          <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                            <div className="w-1 h-4 bg-white rounded-full transform rotate-45"></div>
-                            <div className="w-1 h-6 bg-white rounded-full absolute transform -rotate-45"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="w-8 h-6 rounded shadow-md overflow-hidden">
-                      <div className="w-full h-full bg-gradient-to-b from-orange-500 via-white to-green-600 relative">
-                        <div className="absolute inset-0 bg-blue-600 w-1/3 h-full"></div>
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-white rounded-full"></div>
-                      </div>
-                    </div>
-                    <div className="text-white font-bold text-lg font-mono">{getTimeZoneTime('Asia/Kolkata')}</div>
+              
+              {/* World Times - Right Side (20% width) */}
+              <div className="flex-[0.2] flex flex-col justify-evenly py-4 px-6 border-l border-white/20">
+                {/* First time zone (India) */}
+                <div className="flex items-center justify-end animate-fade-in animate-fade-in-1">
+                  <div className="text-white font-medium text-2xl mr-3" 
+                       style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    {getTimeZoneTime('Asia/Kolkata')}
                   </div>
-                  {/* Vertical Divider */}
-                  <div className="w-px h-20 bg-white/20"></div>
-                  {/* UK */}
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="relative">
-                      <div className="w-16 h-16 rounded-full bg-black flex items-center justify-center shadow-lg">
-                        <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
-                          <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                            <div className="w-1 h-4 bg-white rounded-full transform rotate-45"></div>
-                            <div className="w-1 h-6 bg-white rounded-full absolute transform -rotate-45"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="w-8 h-6 rounded shadow-md overflow-hidden">
-                      <div className="w-full h-full bg-gradient-to-b from-blue-600 via-white to-red-600 relative">
-                        <div className="absolute inset-0 bg-red-600 w-1/3 h-full"></div>
-                        <div className="absolute inset-0 bg-blue-600 w-1/3 h-full left-1/3"></div>
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-white rounded-full"></div>
-                      </div>
-                    </div>
-                    <div className="text-white font-bold text-lg font-mono">{getTimeZoneTime('Europe/London')}</div>
+                  <div className="w-6 h-6 flex items-center justify-center">
+                    <span role="img" aria-label="India" className="text-xl">🇮🇳</span>
                   </div>
-                  {/* Vertical Divider */}
-                  <div className="w-px h-20 bg-white/20"></div>
-                  {/* USA */}
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="relative">
-                      <div className="w-16 h-16 rounded-full bg-black flex items-center justify-center shadow-lg">
-                        <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
-                          <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                            <div className="w-1 h-4 bg-white rounded-full transform rotate-45"></div>
-                            <div className="w-1 h-6 bg-white rounded-full absolute transform -rotate-45"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="w-8 h-6 rounded shadow-md overflow-hidden">
-                      <div className="w-full h-full bg-gradient-to-b from-red-600 via-white to-blue-600 relative">
-                        <div className="absolute inset-0 bg-red-600 w-1/3 h-full"></div>
-                        <div className="absolute inset-0 bg-white w-1/3 h-full left-1/3"></div>
-                        <div className="absolute inset-0 bg-blue-600 w-1/3 h-full left-2/3"></div>
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-white rounded-full"></div>
-                      </div>
-                    </div>
-                    <div className="text-white font-bold text-lg font-mono">{getTimeZoneTime('America/New_York')}</div>
+                </div>
+                
+                {/* Second time zone (UK) */}
+                <div className="flex items-center justify-end animate-fade-in animate-fade-in-2">
+                  <div className="text-white font-medium text-2xl mr-3" 
+                       style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    {getTimeZoneTime('Europe/London')}
+                  </div>
+                  <div className="w-6 h-6 flex items-center justify-center">
+                    <span role="img" aria-label="UK" className="text-xl">🇬🇧</span>
+                  </div>
+                </div>
+                
+                {/* Third time zone (USA) */}
+                <div className="flex items-center justify-end animate-fade-in animate-fade-in-3">
+                  <div className="text-white font-medium text-2xl mr-3" 
+                       style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    {getTimeZoneTime('America/New_York')}
+                  </div>
+                  <div className="w-6 h-6 flex items-center justify-center">
+                    <span role="img" aria-label="USA" className="text-xl">🇺🇸</span>
                   </div>
                 </div>
               </div>

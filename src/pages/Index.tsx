@@ -4,6 +4,7 @@ import Timesheet from '@/components/Timesheet';
 import MyTasks from '@/components/MyTasks';
 import Holidays from '@/components/Holidays';
 import TopNavigation from '@/components/TopNavigation';
+import WorldTimeDisplay from '@/components/WorldTimeDisplay';
 
 interface TimeEntry {
   id: string;
