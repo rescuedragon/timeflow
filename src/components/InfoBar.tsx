@@ -55,7 +55,7 @@ const InfoBar: React.FC<InfoBarProps> = ({
   return (
     <div className="w-full">
       <div className="max-w-7xl mx-auto px-8">
-        <div className="timezone-card relative premium-infobar">
+        <div className="timezone-card relative premium-infobar" style={{ backgroundColor: '#7e22ce' }}>
           {isTimerActive ? (
             <>
               {/* Pulsing white dot in extreme top left with enhanced animation */}

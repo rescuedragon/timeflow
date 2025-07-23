@@ -151,9 +151,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
       <div className="bg-gradient-to-b from-white/95 to-white/85 backdrop-blur-xl border-b border-white/40 p-6">
         <div className="flex items-center gap-5">
           {/* Search Bar - Left Side */}
-          <div className="flex-1 relative group">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-purple-500 transition-colors duration-200" />
-            <Input
+          <div className={`flex-1 apple-search-container ${(showProjectDropdown || showSubprojectDropdown) ? 'expanded' : ''}`}>
+            <input
+              type="text"
               placeholder={
                 !selectedProject 
                   ? "Search and select project..." 
@@ -189,31 +189,33 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                 }, 150);
               }}
               onKeyDown={!selectedProject ? handleProjectKeyDown : handleSubprojectKeyDown}
-              className={`pl-11 pr-11 h-11 bg-white/90 border border-slate-200/60 rounded-2xl text-sm font-normal font-system transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg focus:border-purple-300/60 ${
-                (showProjectDropdown || showSubprojectDropdown) ? 'ring-1 ring-purple-200/40 border-purple-300/60' : ''
-              } ${selectedSubproject ? 'text-purple-600 bg-purple-50/60 border-purple-200/60' : ''}`}
+              className={`apple-search-input ${selectedSubproject ? 'text-purple-600' : ''}`}
               readOnly={!!selectedSubproject}
             />
+            <Search className="apple-search-icon w-4 h-4" />
             
             {/* Clear/Reset Button */}
-            {(selectedProject || selectedSubproject) && (
+            {(selectedProject || projectSearchQuery || subprojectSearchQuery) && (
               <button
                 onClick={() => {
                   if (selectedSubproject) {
                     onSubprojectSelect('');
                     setSubprojectSearchQuery('');
-                  } else {
+                  } else if (selectedProject) {
                     onProjectSelect(null);
+                    setProjectSearchQuery('');
+                  } else {
                     setProjectSearchQuery('');
                   }
                   setShowProjectDropdown(false);
                   setShowSubprojectDropdown(false);
                 }}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100/60 rounded-md transition-all duration-200"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100/60 rounded-full transition-all duration-200"
               >
                 ✕
               </button>
             )}
+
           </div>
           
           {/* Tab Buttons - Right Side */}
@@ -243,15 +245,13 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
           
         {/* Standard Project Dropdown */}
         {!selectedProject && showProjectDropdown && (
-          <div className="absolute mt-2 w-[calc(100%-2.5rem)] bg-white/95 backdrop-blur-xl rounded-xl shadow-xl z-10 border border-white/30 overflow-hidden">
-            <div className="max-h-80 overflow-y-auto">
+          <div className="apple-search-dropdown">
+            <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
               {filteredProjects.map((project, index) => (
                 <div
                   key={project.id}
-                  className={`px-4 py-3 flex justify-between items-center cursor-pointer transition-all duration-150 ${
-                    index === projectDropdownIndex 
-                      ? 'bg-purple-50/60' 
-                      : 'hover:bg-slate-50/80'
+                  className={`apple-search-item ${
+                    index === projectDropdownIndex ? 'highlighted' : ''
                   }`}
                   onClick={() => {
                     onProjectSelect(project);
@@ -260,13 +260,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                     setProjectDropdownIndex(-1);
                   }}
                 >
-                  <div className="flex flex-col">
-                    <div className="text-sm font-medium text-slate-800">{project.name}</div>
-                    <div className="text-xs text-slate-500 mt-1">{project.subprojects.length} tasks</div>
-                  </div>
-                  <div className="text-xs font-medium text-slate-400">
-                    {project.category}
-                  </div>
+                  <div className="text-sm font-medium text-slate-800">{project.name}</div>
                 </div>
               ))}
               {filteredProjects.length === 0 && (
@@ -280,18 +274,14 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
         {/* Subproject Dropdown */}
         {selectedProject && !selectedSubproject && showSubprojectDropdown && (
-          <div className="absolute mt-2 w-[calc(100%-2.5rem)] bg-white/95 backdrop-blur-xl rounded-xl shadow-xl z-10 border border-white/30 overflow-hidden">
-            <div className="max-h-80 overflow-y-auto">
+          <div className="apple-search-dropdown">
+            <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
               {filteredSubprojects.map((subproject, index) => {
-                const frequency = subprojectFrequency[selectedProject.id]?.[subproject] || 0;
-                
                 return (
                   <div
                     key={index}
-                    className={`px-4 py-3 flex justify-between items-center cursor-pointer transition-all duration-150 ${
-                      index === subprojectDropdownIndex 
-                        ? 'bg-purple-50/60' 
-                        : 'hover:bg-slate-50/80'
+                    className={`apple-search-item ${
+                      index === subprojectDropdownIndex ? 'highlighted' : ''
                     }`}
                     onClick={() => {
                       onSubprojectSelect(subproject);
@@ -301,11 +291,6 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                     }}
                   >
                     <div className="text-sm font-medium text-slate-800">{subproject}</div>
-                    {frequency > 0 && (
-                      <div className="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
-                        {frequency} uses
-                      </div>
-                    )}
                   </div>
                 );
               })}

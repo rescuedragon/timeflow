@@ -669,9 +669,7 @@
   height: 160px; /* Fixed height to match original container */
   display: flex;
   align-items: center;
-  height: 160px; /* Fixed height to match original container */
-  display: flex;
-  align-items: center;
+  z-index: 10;
 }
 
 /* Add subtle gradient overlay for depth */
@@ -1698,4 +1696,117 @@ ium InfoBar Styles */
 
 .country-code.us {
   background: linear-gradient(135deg, #B22234 0%, #3C3B6E 100%);
+}
+
+/* Make InfoBar fully opaque */
+.premium-infobar {
+  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 50%, #6b21a8 100%);
+  backdrop-filter: none;
+}
+
+/* Apple-style search bar and dropdown animations */
+@keyframes expandSearch {
+  from {
+    transform: scale(1);
+    border-radius: 2rem;
+  }
+  to {
+    transform: scale(1.02);
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+}
+
+@keyframes expandDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.apple-search-container {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.apple-search-container.expanded {
+  z-index: 100;
+}
+
+.apple-search-input {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 2rem;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  font-size: 0.95rem;
+  color: #333;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  width: 100%;
+}
+
+.apple-search-input:focus {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(138, 92, 246, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  outline: none;
+}
+
+.apple-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a1a1a1;
+  transition: color 0.2s ease;
+}
+
+.apple-search-input:focus + .apple-search-icon {
+  color: #8a5cf6;
+}
+
+.apple-search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(138, 92, 246, 0.2);
+  border-top: none;
+  border-radius: 0 0 1.5rem 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: expandDropdown 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.apple-search-container.expanded .apple-search-input {
+  border-radius: 1.5rem 1.5rem 0 0;
+  border-bottom-color: transparent;
+  animation: expandSearch 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.apple-search-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.apple-search-item:hover {
+  background: rgba(138, 92, 246, 0.05);
+}
+
+.apple-search-item.highlighted {
+  background: rgba(138, 92, 246, 0.1);
+}
+
+.apple-search-item:last-child {
+  border-bottom: none;
 }
