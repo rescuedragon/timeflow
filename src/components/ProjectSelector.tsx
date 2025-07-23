@@ -187,14 +187,17 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   return (
     <div className="w-1/2 bg-white/98 backdrop-blur-2xl border border-white/30 shadow-lg rounded-2xl h-[612px] overflow-hidden" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
       {/* Apple-Style Header Section */}
-      <div className="bg-gradient-to-b from-white/95 to-white/85 backdrop-blur-xl border-b border-white/40 p-6 relative z-50">
-        <div className="flex items-center gap-5">
+      <div className="bg-gradient-to-b from-white/95 to-white/85 backdrop-blur-xl border-b border-white/40 p-6 relative">
+        <div className="relative">
           {/* New Apple-Style Search Bar */}
           <div
             ref={searchContainerRef}
-            className={`w-full flex items-center bg-white border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${isSearchFocused ? 'ring-2 ring-blue-500 border-blue-500' : ''
-              } ${(showProjectDropdown || showSubprojectDropdown) ? 'rounded-t-2xl border-b-0' : 'rounded-2xl'}`}
-            style={{ transition: 'box-shadow 0.2s ease, border-color 0.2s ease, border-radius 0.2s ease' }}
+            className={`search-container w-full flex items-center bg-white border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${
+              isSearchFocused ? 'focused' : ''
+            } ${
+              (showProjectDropdown || showSubprojectDropdown) ? 'dropdown-open rounded-t-2xl' : 'rounded-2xl'
+            }`}
+            style={{ transition: 'all 0.2s ease' }}
             onClick={() => {
               if (inputRef.current) {
                 inputRef.current.focus();
@@ -266,13 +269,12 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
           {/* Standard Project Dropdown */}
           {!selectedProject && showProjectDropdown && (
-            <div className="absolute top-full left-0 right-0 bg-white rounded-b-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-200 border-t-0 z-50 animate-dropdown-enter overflow-hidden">
+            <div className="unified-dropdown absolute top-full left-0 right-0 bg-white rounded-b-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-200 z-50 animate-dropdown-enter overflow-hidden">
               <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-3">
                 {filteredProjects.map((project, index) => (
                   <div
                     key={project.id}
-                    className={`px-4 py-3 cursor-pointer transition-all duration-200 ease-out hover:bg-purple-50/80 hover:scale-[1.02] hover:shadow-sm mx-2 rounded-xl ${index === projectDropdownIndex ? 'bg-purple-100/60 shadow-sm scale-[1.02]' : ''
-                      } animate-dropdown-item`}
+                    className={`dropdown-item px-4 py-3 cursor-pointer ${index === projectDropdownIndex ? 'selected' : ''} animate-dropdown-item`}
                     style={{ animationDelay: `${index * 50}ms` }}
                     onClick={() => {
                       onProjectSelect(project);
@@ -295,14 +297,13 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
           {/* Subproject Dropdown */}
           {selectedProject && !selectedSubproject && showSubprojectDropdown && (
-            <div className="absolute top-full left-0 right-0 bg-white rounded-b-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-200 border-t-0 z-50 animate-dropdown-enter overflow-hidden">
+            <div className="unified-dropdown absolute top-full left-0 right-0 bg-white rounded-b-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-200 z-50 animate-dropdown-enter overflow-hidden">
               <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-3">
                 {filteredSubprojects.map((subproject, index) => {
                   return (
                     <div
                       key={index}
-                      className={`px-4 py-3 cursor-pointer transition-all duration-200 ease-out hover:bg-emerald-50/80 hover:scale-[1.02] hover:shadow-sm mx-2 rounded-xl ${index === subprojectDropdownIndex ? 'bg-emerald-100/60 shadow-sm scale-[1.02]' : ''
-                        } animate-dropdown-item`}
+                      className={`dropdown-item px-4 py-3 cursor-pointer ${index === subprojectDropdownIndex ? 'selected' : ''} animate-dropdown-item`}
                       style={{ animationDelay: `${index * 50}ms` }}
                       onClick={() => {
                         onSubprojectSelect(subproject);

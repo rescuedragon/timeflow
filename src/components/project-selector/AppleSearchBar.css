@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 
-/* New simplified search bar styles */
+/* Apple-style search bar and dropdown unified styling */
 input {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
@@ -13,10 +13,107 @@ input:focus {
   outline: none;
 }
 
-/* Prevent size changes on focus and remove blue highlighting */
+/* Enhanced search container for unified appearance */
 .search-container {
-  transition: box-shadow 0.2s ease, border-color 0.2s ease !important;
+  position: relative;
+  transition: all 0.2s ease !important;
   transform: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Unified focus state - search bar and dropdown feel connected */
+.search-container.focused {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  border-color: rgb(59, 130, 246) !important;
+}
+
+/* When dropdown is open, create seamless connection */
+.search-container.dropdown-open {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-bottom: none !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  position: relative;
+  z-index: 51;
+}
+
+/* Dropdown styling to connect seamlessly with search bar */
+.unified-dropdown {
+  border-top: none !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-color: rgb(59, 130, 246) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  top: 100% !important;
+  position: absolute;
+  z-index: 50;
+  left: 0;
+  right: 0;
+}
+
+/* Ensure no gaps in the parent container */
+.search-container > * {
+  margin: 0 !important;
+}
+
+/* Force seamless connection */
+.search-container.dropdown-open + .unified-dropdown,
+.search-container .unified-dropdown {
+  margin-top: 0 !important;
+  border-top-width: 0 !important;
+}
+
+/* Smooth dropdown animations */
+@keyframes dropdown-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdown-item {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-dropdown-enter {
+  animation: dropdown-enter 0.2s ease-out;
+}
+
+.animate-dropdown-item {
+  animation: dropdown-item 0.15s ease-out;
+}
+
+/* Enhanced hover states for dropdown items */
+.dropdown-item {
+  transition: all 0.15s ease-out;
+  border-radius: 12px;
+  margin: 0 8px;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(139, 92, 246, 0.08) !important;
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+}
+
+.dropdown-item.selected {
+  background-color: rgba(139, 92, 246, 0.12) !important;
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
 }
 
 /* Remove blue outline on focus */
@@ -34,5 +131,10 @@ input:focus {
 @media (max-width: 768px) {
   .flex.ml-4.gap-4 {
     display: none;
+  }
+  
+  .search-container.focused,
+  .search-container.dropdown-open {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1), 0 4px 16px rgba(0, 0, 0, 0.1) !important;
   }
 }
