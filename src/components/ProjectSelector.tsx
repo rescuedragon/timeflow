@@ -63,6 +63,17 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
   // Removed auto-unselect timer - project and subproject selection should persist
 
+  // Clear search queries when project/subproject are deselected
+  useEffect(() => {
+    if (!selectedProject) {
+      setProjectSearchQuery('');
+      setSubprojectSearchQuery('');
+    }
+    if (!selectedSubproject) {
+      setSubprojectSearchQuery('');
+    }
+  }, [selectedProject, selectedSubproject]);
+
   // Handle click outside to remove focus
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
