@@ -78,6 +78,12 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        // Check if click is on the close button (×)
+        const target = e.target as HTMLElement;
+        if (target.textContent === '×' || target.closest('.close-button')) {
+          return; // Don't close if clicking the close button
+        }
+        
         setIsSearchFocused(false);
         setShowProjectDropdown(false);
         setShowSubprojectDropdown(false);
@@ -87,6 +93,15 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
+
+  // Handle close button click for full screen mode
+  const handleCloseFullScreen = () => {
+    setIsSearchFocused(false);
+    setShowProjectDropdown(false);
+    setShowSubprojectDropdown(false);
+    setProjectDropdownIndex(-1);
+    setSubprojectDropdownIndex(-1);
+  };
 
   // Filter projects based on search query
   const filteredProjects = projects.filter(project =>
@@ -195,10 +210,17 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
             className={`search-container w-full flex items-center bg-white border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${
               isSearchFocused ? 'focused' : ''
             } ${
-              (showProjectDropdown || showSubprojectDropdown) ? 'dropdown-open rounded-t-2xl' : 'rounded-2xl'
+              (showProjectDropdown || showSubprojectDropdown) ? 'dropdown-open expanded-search' : 'rounded-2xl'
             }`}
-            style={{ transition: 'all 0.2s ease' }}
-            onClick={() => {
+            style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
+            onClick={(e) => {
+              // Handle close button click
+              const target = e.target as HTMLElement;
+              if (target.textContent === '×' || target.closest('.close-button')) {
+                handleCloseFullScreen();
+                return;
+              }
+              
               if (inputRef.current) {
                 inputRef.current.focus();
               }
@@ -264,7 +286,21 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                   QuickStart
                 </button>
               </div>
+              
+              {/* Close button for full screen mode */}
+              {(showProjectDropdown || showSubprojectDropdown) && (
+                <button
+                  className="close-button absolute top-6 right-6 w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all duration-200 z-[10001]"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCloseFullScreen();
+                  }}
+                >
+                  <span className="text-gray-600 text-lg font-light">×</span>
+                </button>
+              )}
             </div>
+
           </div>
 
           {/* Standard Project Dropdown */}

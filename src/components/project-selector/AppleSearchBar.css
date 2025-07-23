@@ -16,35 +16,235 @@ input:focus {
 /* Enhanced search container for unified appearance */
 .search-container {
   position: relative;
-  transition: all 0.2s ease !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   transform: none !important;
   margin: 0 !important;
   padding: 0 !important;
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 /* Unified focus state - search bar and dropdown feel connected */
 .search-container.focused {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 8px 32px rgba(0, 0, 0, 0.12) !important;
-  border-color: rgb(59, 130, 246) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  border-color: rgb(229, 231, 235) !important;
 }
 
-/* When dropdown is open, create seamless connection */
+/* When dropdown is open, expand to full container size */
 .search-container.dropdown-open {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(20px) !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  animation: expand-to-full 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Add blur effect to background when search is full screen */
+.search-container.dropdown-open ~ * {
+  filter: blur(4px);
+  transition: filter 0.3s ease;
+}
+
+/* Animation for expanding to full screen */
+@keyframes expand-to-full {
+  0% {
+    transform: scale(1);
+    border-radius: 16px;
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.02);
+    border-radius: 12px;
+    opacity: 0.98;
+  }
+  50% {
+    transform: scale(1.05);
+    border-radius: 8px;
+    opacity: 0.95;
+  }
+  75% {
+    transform: scale(1.02);
+    border-radius: 4px;
+    opacity: 0.98;
+  }
+  100% {
+    transform: scale(1);
+    border-radius: 0;
+    opacity: 1;
+  }
+}
+
+/* Animation for collapsing back */
+@keyframes collapse-from-full {
+  0% {
+    transform: scale(1);
+    border-radius: 0;
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    border-radius: 8px;
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1);
+    border-radius: 16px;
+    opacity: 1;
+  }
+}
+
+.search-container.collapsing {
+  animation: collapse-from-full 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Full screen search input styling */
+.search-container.dropdown-open .px-4.py-3 {
+  padding: 32px 24px 24px 24px !important;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  position: relative;
+  z-index: 1;
+}
+
+.search-container.dropdown-open input {
+  font-size: 20px !important;
+  padding: 16px 0 !important;
+  font-weight: 500 !important;
+}
+
+.search-container.dropdown-open .w-5.h-5 {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+/* Dropdown styling for full screen mode */
+.search-container.dropdown-open .unified-dropdown {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  flex: 1 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Full screen dropdown content */
+.search-container.dropdown-open .unified-dropdown .max-h-\[calc\(100vh-200px\)\] {
+  max-height: calc(100vh - 120px) !important;
+  padding: 0 !important;
+  overflow-y: auto !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Full screen dropdown items */
+.search-container.dropdown-open ~ .unified-dropdown .dropdown-item {
+  margin: 0 !important;
+  padding: 24px !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.3) !important;
+  font-size: 16px !important;
+  transition: all 0.2s ease !important;
+  position: relative;
+  display: block !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.search-container.dropdown-open ~ .unified-dropdown .dropdown-item:hover {
+  background-color: rgba(139, 92, 246, 0.08) !important;
+  transform: none !important;
+  box-shadow: none !important;
+  padding-left: 32px !important;
+}
+
+.search-container.dropdown-open ~ .unified-dropdown .dropdown-item.selected {
+  background-color: rgba(139, 92, 246, 0.12) !important;
+  transform: none !important;
+  box-shadow: none !important;
+  padding-left: 32px !important;
+}
+
+.search-container.dropdown-open ~ .unified-dropdown .dropdown-item .text-sm {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #1f2937 !important;
+}
+
+/* Close button styling for full screen mode */
+.close-button {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+}
+
+.close-button:hover {
+  background: rgba(0, 0, 0, 0.15);
+  transform: scale(1.1);
+}
+
+.close-button span {
+  color: #6b7280;
+  font-size: 20px;
+  font-weight: 300;
+  transition: color 0.2s ease;
+}
+
+.close-button:hover span {
+  color: #374151;
+}
+
+/* When dropdown is open, create seamless connection (for non-fullscreen mode) */
+.search-container:not(.dropdown-open).focused {
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
   border-bottom: none !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
   position: relative;
   z-index: 51;
+  border-color: rgb(229, 231, 235) !important;
 }
 
-/* Dropdown styling to connect seamlessly with search bar */
+/* Dropdown styling to connect seamlessly with search bar (for non-fullscreen mode) */
 .unified-dropdown {
   border-top: none !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
-  border-color: rgb(59, 130, 246) !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  border-color: rgb(229, 231, 235) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
   margin: 0 !important;
   padding: 0 !important;
   top: 100% !important;
@@ -54,16 +254,57 @@ input:focus {
   right: 0;
 }
 
+/* Full screen dropdown positioning */
+.search-container.dropdown-open ~ .unified-dropdown {
+  position: fixed !important;
+  top: 120px !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: calc(100vh - 120px) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  z-index: 10000 !important;
+  overflow: hidden !important;
+}
+
+.search-container.dropdown-open ~ .unified-dropdown .max-h-\[calc\(100vh-200px\)\] {
+  max-height: calc(100vh - 120px) !important;
+  padding: 0 !important;
+  overflow-y: auto !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
 /* Ensure no gaps in the parent container */
 .search-container > * {
   margin: 0 !important;
 }
 
 /* Force seamless connection */
-.search-container.dropdown-open + .unified-dropdown,
-.search-container .unified-dropdown {
+.search-container:not(.dropdown-open).focused + .unified-dropdown,
+.search-container:not(.dropdown-open) .unified-dropdown {
   margin-top: 0 !important;
   border-top-width: 0 !important;
+}
+
+/* Enhanced animation for expansion */
+@keyframes expand-container {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+}
+
+.expanded-container {
+  animation: expand-container 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Smooth dropdown animations */
