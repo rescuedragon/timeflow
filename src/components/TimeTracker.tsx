@@ -142,6 +142,22 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
     });
   }, [isTimerActive, isRunning, isPaused, selectedProject, selectedSubproject, time]);
 
+  // Handle visibility change to prevent timer from being affected by tab switching
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isRunning && !isPaused && startTime) {
+        // Recalculate time when tab becomes visible again
+        const now = Date.now();
+        const elapsed = Math.floor((now - startTime.getTime()) / 1000);
+        console.log('Tab became visible, updating time:', elapsed);
+        setTime(elapsed);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isRunning, isPaused, startTime]);
+
   // Handle quick start selection and auto-start timer
   const handleQuickStart = (quickStartItem: QuickStartItem) => {
     const project = projects.find(p => p.id === quickStartItem.projectId);
@@ -160,17 +176,16 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isRunning && !isPaused) {
+    if (isRunning && !isPaused && startTime) {
       console.log('Starting timer interval');
       interval = setInterval(() => {
-        setTime(prevTime => {
-          const newTime = prevTime + 1;
-          console.log('Timer tick:', newTime, 'seconds');
-          return newTime;
-        });
+        const now = Date.now();
+        const elapsed = Math.floor((now - startTime.getTime()) / 1000);
+        console.log('Timer tick:', elapsed, 'seconds');
+        setTime(elapsed);
       }, 1000);
     } else {
-      console.log('Timer stopped or paused:', { isRunning, isPaused });
+      console.log('Timer stopped or paused:', { isRunning, isPaused, hasStartTime: !!startTime });
     }
     return () => {
       if (interval) {
@@ -178,7 +193,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
         clearInterval(interval);
       }
     };
-  }, [isRunning, isPaused]);
+  }, [isRunning, isPaused, startTime]);
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
