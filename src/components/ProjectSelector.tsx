@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Search, Clock, ChevronRight } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import React, { useState, useEffect, useRef } from 'react';
+import { ChevronRight, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import './project-selector/AppleSearchBar.css';
 
 interface Project {
   id: string;
@@ -47,7 +47,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'quick' | 'frequent'>('frequent');
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
-  
+
   // Dropdown states
   const [showProjectDropdown, setShowProjectDropdown] = useState(false);
   const [showSubprojectDropdown, setShowSubprojectDropdown] = useState(false);
@@ -55,21 +55,56 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   const [subprojectDropdownIndex, setSubprojectDropdownIndex] = useState<number>(-1);
   const [projectSearchQuery, setProjectSearchQuery] = useState('');
   const [subprojectSearchQuery, setSubprojectSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  // For the dropdown, we'll use all projects
+  // Refs
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Timer for auto-unselect
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (selectedProject && selectedSubproject) {
+      timer = setTimeout(() => {
+        onProjectSelect(null);
+        onSubprojectSelect('');
+      }, 10000);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [selectedProject, selectedSubproject, onProjectSelect, onSubprojectSelect]);
+
+  // Handle click outside to remove focus
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setIsSearchFocused(false);
+        setShowProjectDropdown(false);
+        setShowSubprojectDropdown(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  // Filter projects based on search query
   const filteredProjects = projects.filter(project =>
     project.name.toLowerCase().includes(projectSearchQuery.toLowerCase())
   );
 
   // Get subprojects sorted by frequency when a project is selected
-  const filteredSubprojects = selectedProject 
+  const filteredSubprojects = selectedProject
     ? selectedProject.subprojects
-        .filter(sub => sub.toLowerCase().includes(subprojectSearchQuery.toLowerCase()))
-        .sort((a, b) => {
-          const aFreq = subprojectFrequency[selectedProject.id]?.[a] || 0;
-          const bFreq = subprojectFrequency[selectedProject.id]?.[b] || 0;
-          return bFreq - aFreq;
-        })
+      .filter(sub => sub.toLowerCase().includes(subprojectSearchQuery.toLowerCase()))
+      .sort((a, b) => {
+        const aFreq = subprojectFrequency[selectedProject.id]?.[a] || 0;
+        const bFreq = subprojectFrequency[selectedProject.id]?.[b] || 0;
+        return bFreq - aFreq;
+      })
     : [];
 
   // Keyboard navigation handlers
@@ -145,163 +180,151 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
     }
   };
 
-  return (
-    <div className="w-1/2 bg-white/98 backdrop-blur-2xl border border-white/30 shadow-lg rounded-2xl h-[612px] overflow-hidden">
-      {/* Apple-Style Header Section */}
-      <div className="bg-gradient-to-b from-white/95 to-white/85 backdrop-blur-xl border-b border-white/40 p-6">
-        <div className="flex items-center gap-5">
-          {/* Search Bar - Left Side */}
-          <div className={`flex-1 apple-search-container ${(showProjectDropdown || showSubprojectDropdown) ? 'expanded' : ''}`}>
-            <input
-              type="text"
-              placeholder={
-                !selectedProject 
-                  ? "Search and select project..." 
-                  : selectedSubproject 
-                    ? `${selectedProject.name} → ${selectedSubproject}` 
-                    : `Search ${selectedProject.name} tasks...`
-              }
-              value={!selectedProject ? projectSearchQuery : subprojectSearchQuery}
-              onChange={(e) => {
-                if (!selectedProject) {
-                  setProjectSearchQuery(e.target.value);
-                  setShowProjectDropdown(true);
-                  setProjectDropdownIndex(-1);
-                } else {
-                  setSubprojectSearchQuery(e.target.value);
-                  setShowSubprojectDropdown(true);
-                  setSubprojectDropdownIndex(-1);
-                }
-              }}
-              onFocus={() => {
-                if (!selectedProject) {
-                  setShowProjectDropdown(true);
-                  setProjectDropdownIndex(-1);
-                } else {
-                  setShowSubprojectDropdown(true);
-                  setSubprojectDropdownIndex(-1);
-                }
-              }}
-              onBlur={() => {
-                setTimeout(() => {
-                  setShowProjectDropdown(false);
-                  setShowSubprojectDropdown(false);
-                }, 150);
-              }}
-              onKeyDown={!selectedProject ? handleProjectKeyDown : handleSubprojectKeyDown}
-              className={`apple-search-input ${selectedSubproject ? 'text-purple-600' : ''}`}
-              readOnly={!!selectedSubproject}
-            />
-            <Search className="apple-search-icon w-4 h-4" />
-            
-            {/* Clear/Reset Button */}
-            {(selectedProject || projectSearchQuery || subprojectSearchQuery) && (
-              <button
-                onClick={() => {
-                  if (selectedSubproject) {
-                    onSubprojectSelect('');
-                    setSubprojectSearchQuery('');
-                  } else if (selectedProject) {
-                    onProjectSelect(null);
-                    setProjectSearchQuery('');
-                  } else {
-                    setProjectSearchQuery('');
-                  }
-                  setShowProjectDropdown(false);
-                  setShowSubprojectDropdown(false);
-                }}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100/60 rounded-full transition-all duration-200"
-              >
-                ✕
-              </button>
-            )}
+  // Determine placeholder based on state
+  const placeholder = selectedProject
+    ? "Select a task..."
+    : activeTab === 'frequent'
+      ? "Search and select project..."
+      : "Search QuickStart templates...";
 
-          </div>
-          
-          {/* Tab Buttons - Right Side */}
-          <div className="flex bg-slate-100/60 rounded-2xl p-1">
-            <button
-              onClick={() => setActiveTab('frequent')}
-              className={`px-5 py-2.5 text-center font-medium text-sm transition-all duration-200 rounded-xl ${
-                activeTab === 'frequent'
-                  ? 'bg-white text-purple-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'
+  return (
+    <div className="w-1/2 bg-white/98 backdrop-blur-2xl border border-white/30 shadow-lg rounded-2xl h-[612px] overflow-hidden" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+      {/* Apple-Style Header Section */}
+      <div className="bg-gradient-to-b from-white/95 to-white/85 backdrop-blur-xl border-b border-white/40 p-6 relative z-50">
+        <div className="flex items-center gap-5">
+          {/* New Apple-Style Search Bar */}
+          <div
+            ref={searchContainerRef}
+            className={`w-full flex items-center bg-white rounded-2xl border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${isSearchFocused ? 'ring-2 ring-blue-500 border-blue-500' : ''
               }`}
-            >
-              Frequently Used
-            </button>
-            <button
-              onClick={() => setActiveTab('quick')}
-              className={`px-5 py-2.5 text-center font-medium text-sm transition-all duration-200 rounded-xl ${
-                activeTab === 'quick'
-                  ? 'bg-white text-purple-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'
-              }`}
-            >
-              Quick Start
-            </button>
-          </div>
-        </div>
-          
-        {/* Standard Project Dropdown */}
-        {!selectedProject && showProjectDropdown && (
-          <div className="apple-search-dropdown">
-            <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-              {filteredProjects.map((project, index) => (
-                <div
-                  key={project.id}
-                  className={`apple-search-item ${
-                    index === projectDropdownIndex ? 'highlighted' : ''
-                  }`}
-                  onClick={() => {
-                    onProjectSelect(project);
-                    setProjectSearchQuery(project.name);
-                    setShowProjectDropdown(false);
+            style={{ transition: 'box-shadow 0.2s ease, border-color 0.2s ease' }}
+            onClick={() => {
+              if (inputRef.current) {
+                inputRef.current.focus();
+              }
+            }}
+          >
+            <div className="px-4 py-3 flex items-center w-full">
+              <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
+              <input
+                ref={inputRef}
+                type="text"
+                className="flex-1 border-none outline-none text-gray-700 placeholder-gray-400 text-base mx-2 bg-transparent"
+                placeholder={placeholder}
+                value={selectedProject ? subprojectSearchQuery : projectSearchQuery}
+                onChange={(e) => {
+                  if (!selectedProject) {
+                    setProjectSearchQuery(e.target.value);
+                    setShowProjectDropdown(true);
                     setProjectDropdownIndex(-1);
+                  } else {
+                    setSubprojectSearchQuery(e.target.value);
+                    setShowSubprojectDropdown(true);
+                    setSubprojectDropdownIndex(-1);
+                  }
+                }}
+                onFocus={() => {
+                  setIsSearchFocused(true);
+                  if (!selectedProject) {
+                    setShowProjectDropdown(true);
+                    setProjectDropdownIndex(-1);
+                  } else {
+                    setShowSubprojectDropdown(true);
+                    setSubprojectDropdownIndex(-1);
+                  }
+                }}
+                onBlur={() => {
+                  setTimeout(() => {
+                    setIsSearchFocused(false);
+                  }, 200);
+                }}
+                onKeyDown={!selectedProject ? handleProjectKeyDown : handleSubprojectKeyDown}
+                autoComplete="off"
+              />
+              <div className={`flex items-center ml-3 pl-3 border-l border-gray-200 ${isSearchFocused ? 'opacity-0 invisible' : 'opacity-100 visible'}`} 
+                style={{ transition: 'opacity 0.2s ease, visibility 0.2s ease' }}>
+                <button
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${activeTab === 'frequent' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveTab('frequent');
                   }}
                 >
-                  <div className="text-sm font-medium text-slate-800">{project.name}</div>
-                </div>
-              ))}
-              {filteredProjects.length === 0 && (
-                <div className="px-4 py-6 text-center">
-                  <div className="text-sm text-slate-500">No projects found</div>
-                </div>
-              )}
+                  Frequently Used
+                </button>
+                <button
+                  className={`px-3 py-1 rounded-full text-sm font-medium ml-2 transition-colors ${activeTab === 'quick' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveTab('quick');
+                  }}
+                >
+                  QuickStart
+                </button>
+              </div>
             </div>
           </div>
-        )}
 
-        {/* Subproject Dropdown */}
-        {selectedProject && !selectedSubproject && showSubprojectDropdown && (
-          <div className="apple-search-dropdown">
-            <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-              {filteredSubprojects.map((subproject, index) => {
-                return (
+          {/* Standard Project Dropdown */}
+          {!selectedProject && showProjectDropdown && (
+            <div className="absolute top-full left-6 right-6 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
+              <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-2">
+                {filteredProjects.map((project, index) => (
                   <div
-                    key={index}
-                    className={`apple-search-item ${
-                      index === subprojectDropdownIndex ? 'highlighted' : ''
-                    }`}
+                    key={project.id}
+                    className={`px-4 py-2 cursor-pointer hover:bg-gray-50 ${index === projectDropdownIndex ? 'bg-gray-50' : ''
+                      }`}
                     onClick={() => {
-                      onSubprojectSelect(subproject);
-                      setSubprojectSearchQuery(subproject);
-                      setShowSubprojectDropdown(false);
-                      setSubprojectDropdownIndex(-1);
+                      onProjectSelect(project);
+                      setProjectSearchQuery(project.name);
+                      setShowProjectDropdown(false);
+                      setProjectDropdownIndex(-1);
                     }}
                   >
-                    <div className="text-sm font-medium text-slate-800">{subproject}</div>
+                    <div className="text-sm font-medium text-slate-800">{project.name}</div>
                   </div>
-                );
-              })}
-              {filteredSubprojects.length === 0 && (
-                <div className="px-4 py-6 text-center">
-                  <div className="text-sm text-slate-500">No tasks found</div>
-                </div>
-              )}
+                ))}
+                {filteredProjects.length === 0 && (
+                  <div className="px-4 py-6 text-center">
+                    <div className="text-sm text-slate-500">No projects found</div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Subproject Dropdown */}
+          {selectedProject && !selectedSubproject && showSubprojectDropdown && (
+            <div className="absolute top-full left-6 right-6 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
+              <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-2">
+                {filteredSubprojects.map((subproject, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className={`px-4 py-2 cursor-pointer hover:bg-gray-50 ${index === subprojectDropdownIndex ? 'bg-gray-50' : ''
+                        }`}
+                      onClick={() => {
+                        onSubprojectSelect(subproject);
+                        setSubprojectSearchQuery(subproject);
+                        setShowSubprojectDropdown(false);
+                        setSubprojectDropdownIndex(-1);
+                      }}
+                    >
+                      <div className="text-sm font-medium text-slate-800">{subproject}</div>
+                    </div>
+                  );
+                })}
+                {filteredSubprojects.length === 0 && (
+                  <div className="px-4 py-6 text-center">
+                    <div className="text-sm text-slate-500">No tasks found</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Premium Content Section */}
@@ -343,7 +366,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
               {frequentlyUsedProjects.length > 0 ? (
                 <div className="divide-y divide-slate-100/40">
                   {frequentlyUsedProjects.map((project) => (
-                    <div 
+                    <div
                       key={project.id}
                       className="group"
                     >
@@ -355,15 +378,13 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                         }}
                       >
                         <div className="font-medium text-base text-slate-700 group-hover:text-purple-600 transition-colors duration-200">{project.name}</div>
-                        <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
-                          expandedProject === project.id ? 'rotate-90' : ''
-                        }`} />
+                        <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expandedProject === project.id ? 'rotate-90' : ''
+                          }`} />
                       </button>
-                      
+
                       {/* Subprojects list - shown when expanded */}
-                      <div className={`overflow-hidden transition-all duration-200 ${
-                        expandedProject === project.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                      }`}>
+                      <div className={`overflow-hidden transition-all duration-200 ${expandedProject === project.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                        }`}>
                         <div className="bg-slate-50/30 border-t border-slate-100/30">
                           {project.subprojects
                             .sort((a, b) => {
@@ -407,47 +428,20 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
           </div>
         )}
 
-        {/* Show Quick Start Combinations when no project is selected and activeTab is 'quick' */}
+        {/* Empty QuickStart section */}
         {!selectedProject && activeTab === 'quick' && (
           <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mb-6">
-            <div className="h-full overflow-y-auto">
-              {quickStartCombinations.length > 0 ? (
-                <div className="divide-y divide-slate-100/40">
-                  {quickStartCombinations.map((item) => (
-                    <div 
-                      key={item.id}
-                      className="group"
-                    >
-                      <button
-                        className="w-full px-6 py-5 text-left hover:bg-slate-50/60 active:bg-slate-100/40 transition-all duration-200"
-                        onClick={() => onQuickStart(item)}
-                      >
-                        <div className="space-y-2">
-                          <div className="flex items-start">
-                            <div className="flex-1">
-                              <div className="font-medium text-base text-slate-700 group-hover:text-purple-600 transition-colors duration-200">{item.projectName}</div>
-                              <div className="text-sm text-purple-500 font-normal mt-1">{item.subproject}</div>
-                            </div>
-                            <div className="text-xs text-slate-400 bg-slate-100/50 px-2 py-1 rounded-full">{item.lastUsed}</div>
-                          </div>
-                          <div className="flex items-center text-xs text-slate-500">
-                            <Clock className="w-3.5 h-3.5 mr-1" />
-                            Used {item.frequency} times
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  ))}
+            <div className="h-full flex items-center justify-center">
+              <div className="text-center text-slate-400 py-20">
+                <div className="w-12 h-12 bg-slate-100/60 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
                 </div>
-              ) : (
-                <div className="text-center text-slate-400 py-20">
-                  <div className="w-12 h-12 bg-slate-100/60 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Clock className="w-6 h-6 text-slate-400" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2 text-slate-600">No quick start combinations</h3>
-                  <p className="text-sm text-slate-500">Start tracking time to see combinations here</p>
-                </div>
-              )}
+                <h3 className="text-lg font-medium mb-2 text-slate-600">QuickStart</h3>
+                <p className="text-sm text-slate-500">This section is currently empty</p>
+              </div>
             </div>
           </div>
         )}

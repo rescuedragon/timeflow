@@ -1,0 +1,19 @@
+/* Remove all focus highlighting */
+*:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+input:focus, 
+button:focus,
+div:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: #e5e7eb !important; /* Keep the default border color */
+}
+
+/* Prevent any blue highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent !important;
+}
