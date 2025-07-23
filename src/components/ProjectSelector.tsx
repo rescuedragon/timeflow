@@ -192,9 +192,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
           {/* New Apple-Style Search Bar */}
           <div
             ref={searchContainerRef}
-            className={`w-full flex items-center bg-white rounded-2xl border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${isSearchFocused ? 'ring-2 ring-blue-500 border-blue-500' : ''
-              }`}
-            style={{ transition: 'box-shadow 0.2s ease, border-color 0.2s ease' }}
+            className={`w-full flex items-center bg-white border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${isSearchFocused ? 'ring-2 ring-blue-500 border-blue-500' : ''
+              } ${(showProjectDropdown || showSubprojectDropdown) ? 'rounded-t-2xl' : 'rounded-2xl'}`}
+            style={{ transition: 'box-shadow 0.2s ease, border-color 0.2s ease, border-radius 0.2s ease' }}
             onClick={() => {
               if (inputRef.current) {
                 inputRef.current.focus();
@@ -266,7 +266,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
           {/* Standard Project Dropdown */}
           {!selectedProject && showProjectDropdown && (
-            <div className="absolute top-full left-6 right-6 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 z-50 animate-dropdown-enter overflow-hidden">
+            <div className="absolute top-full left-6 right-6 bg-white/95 backdrop-blur-xl rounded-b-2xl shadow-2xl border border-white/20 border-t-0 z-50 animate-dropdown-enter overflow-hidden">
               <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-3">
                 {filteredProjects.map((project, index) => (
                   <div
@@ -295,7 +295,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
           {/* Subproject Dropdown */}
           {selectedProject && !selectedSubproject && showSubprojectDropdown && (
-            <div className="absolute top-full left-6 right-6 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 z-50 animate-dropdown-enter overflow-hidden">
+            <div className="absolute top-full left-6 right-6 bg-white/95 backdrop-blur-xl rounded-b-2xl shadow-2xl border border-white/20 border-t-0 z-50 animate-dropdown-enter overflow-hidden">
               <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-3">
                 {filteredSubprojects.map((subproject, index) => {
                   return (
