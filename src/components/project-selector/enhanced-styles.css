@@ -89,3 +89,79 @@
   background-color: rgba(139, 92, 246, 0.08) !important;
   padding-left: 32px !important;
 }
+
+/* Square Card Styles with Glassmorphic Hover Effect */
+.square-card {
+  position: relative;
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.square-card:hover {
+  border-color: rgba(126, 34, 206, 0.3);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(126, 34, 206, 0.15);
+}
+
+.square-card button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.square-card button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 50%, #6b21a8 100%);
+  opacity: 0;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(20px);
+  border-radius: inherit;
+}
+
+.square-card:hover button::before {
+  opacity: 1;
+}
+
+.square-card button .project-name {
+  position: relative;
+  z-index: 2;
+  font-family: 'Inter', 'Poppins', sans-serif;
+  font-size: 1.4625rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #1f2937;
+  transition: color 0.2s ease, transform 0.2s ease, text-shadow 0.2s ease;
+}
+
+.square-card:hover button .project-name {
+  color: white !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
+}
+
+/* Grid layout adjustments */
+.grid.grid-cols-2.grid-rows-3 {
+  height: calc(100% - 1.5rem);
+  max-height: 495px;
+  min-height: 435px;
+}
+
+/* Ensure perfect squares that fill the space */
+.aspect-square {
+  aspect-ratio: 1 / 1;
+  height: calc((100% - 1.5rem) / 3);
+  max-height: 162px;
+}
+
+/* Make cards fill the available space better */
+.square-card {
+  height: 100%;
+  width: 100%;
+}

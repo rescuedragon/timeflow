@@ -431,58 +431,75 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
         {/* Show Frequently Used Projects when no project is selected and activeTab is 'frequent' */}
         {!selectedProject && activeTab === 'frequent' && (
           <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mb-6">
-            <div className="h-full overflow-y-auto p-3">
+            <div className="h-full overflow-y-auto">
               {frequentlyUsedProjects.length > 0 ? (
-                <div className="space-y-3 p-3">
-                  {frequentlyUsedProjects.map((project) => (
+                <div className="grid grid-cols-2 grid-rows-3 gap-3 p-3 h-full">
+                  {frequentlyUsedProjects.slice(0, 6).map((project) => (
                     <div
                       key={project.id}
-                      className="group"
+                      className="group relative"
                     >
-                      <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border-l-4 border-gray-200 category-card">
+                      <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 square-card aspect-square flex flex-col">
                         <button
-                          className="w-full px-5 py-4 text-left transition-all duration-200 flex items-center justify-between"
+                          className="w-full h-full p-4 text-center transition-all duration-200 flex flex-col items-center justify-center relative overflow-hidden rounded-xl"
                           onClick={() => {
                             const expandedProjectId = expandedProject === project.id ? null : project.id;
                             setExpandedProject(expandedProjectId);
                           }}
                         >
-                          <div className="font-medium text-base text-slate-700 group-hover:text-purple-600 transition-colors duration-200">{project.name}</div>
-                          <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expandedProject === project.id ? 'rotate-90' : ''
-                            }`} />
+                          {/* Project Name */}
+                          <div className="project-name text-center px-4">
+                            {project.name}
+                          </div>
                         </button>
 
-                        {/* Subprojects list - shown when expanded */}
-                        <div className={`overflow-hidden transition-all duration-200 ${expandedProject === project.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                          }`}>
-                          <div className="bg-slate-50/30 border-t border-slate-100/30 pt-2 pb-1 px-2">
-                            {project.subprojects
-                              .sort((a, b) => {
-                                const aFreq = subprojectFrequency[project.id]?.[a] || 0;
-                                const bFreq = subprojectFrequency[project.id]?.[b] || 0;
-                                return bFreq - aFreq;
-                              })
-                              .map((subproject, idx) => (
-                                <div key={idx} className="mb-2 mx-2">
+                        {/* Subprojects overlay - shown when expanded */}
+                        {expandedProject === project.id && (
+                          <div className="absolute inset-0 bg-white rounded-xl shadow-lg border border-slate-200 z-10 overflow-hidden">
+                            <div className="p-3 border-b border-slate-100 flex items-center justify-between">
+                              <h4 className="font-medium text-sm text-slate-700">{project.name}</h4>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedProject(null);
+                                }}
+                                className="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
+                              >
+                                <span className="text-xs text-slate-500">×</span>
+                              </button>
+                            </div>
+                            <div className="p-2 max-h-32 overflow-y-auto">
+                              {project.subprojects
+                                .sort((a, b) => {
+                                  const aFreq = subprojectFrequency[project.id]?.[a] || 0;
+                                  const bFreq = subprojectFrequency[project.id]?.[b] || 0;
+                                  return bFreq - aFreq;
+                                })
+                                .slice(0, 4)
+                                .map((subproject, idx) => (
                                   <button
-                                    className="w-full px-4 py-3 pl-8 text-left bg-white rounded-md hover:bg-purple-50/70 active:bg-purple-100/50 transition-all duration-200 group/subtask flex justify-between items-center shadow-sm hover:shadow subproject-card"
-                                    onClick={() => {
+                                    key={idx}
+                                    className="w-full px-3 py-2 text-left text-xs bg-slate-50 hover:bg-purple-50 rounded-lg mb-1 transition-colors duration-200 text-slate-600 hover:text-purple-600"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       onProjectSelect(project);
                                       onSubprojectSelect(subproject);
                                       setProjectSearchQuery(project.name);
                                       setSubprojectSearchQuery(subproject);
                                     }}
                                   >
-                                    <div className="text-sm text-slate-600 group-hover/subtask:text-purple-600 font-normal transition-colors duration-200">{subproject}</div>
-                                    <div className="text-xs text-slate-400">
-                                      {subprojectFrequency[project.id]?.[subproject] || 0} uses
-                                    </div>
+                                    {subproject}
                                   </button>
+                                ))
+                              }
+                              {project.subprojects.length > 4 && (
+                                <div className="text-xs text-slate-400 text-center py-1">
+                                  +{project.subprojects.length - 4} more
                                 </div>
-                              ))
-                            }
+                              )}
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </div>
                   ))}
