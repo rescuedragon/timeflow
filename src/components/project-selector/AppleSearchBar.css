@@ -17,6 +17,8 @@ input:focus {
 .search-container .w-5.h-5 {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: #9ca3af;
+  will-change: transform, filter;
+  transform: translateZ(0);
 }
 
 /* Enhanced search container for unified appearance */
@@ -36,20 +38,20 @@ input:focus {
   border-color: rgb(229, 231, 235) !important;
 }
 
-/* Search icon focus state */
+/* Search icon focus state - optimized */
 .search-container.focused:not(.dropdown-open) .w-5.h-5 {
   color: #8b5cf6 !important;
-  animation: search-icon-pulse 1.5s ease-in-out infinite !important;
+  animation: search-icon-pulse 2s ease-in-out infinite !important;
 }
 
 @keyframes search-icon-pulse {
   0%, 100% {
     transform: scale(1);
-    filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.2));
+    filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.3));
   }
   50% {
-    transform: scale(1.1);
-    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.5));
   }
 }
 
@@ -66,45 +68,32 @@ input:focus {
   border: none !important;
   box-shadow: none !important;
   background: rgba(255, 255, 255, 0.98) !important;
-  backdrop-filter: blur(20px) !important;
   z-index: 9999 !important;
   display: flex !important;
   flex-direction: column !important;
-  animation: expand-to-full 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  animation: expand-to-full 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
-/* Add blur effect to background when search is full screen */
+/* Remove blur effect for background when search is full screen */
 .search-container.dropdown-open ~ * {
-  filter: blur(4px);
   transition: filter 0.3s ease;
 }
 
-/* Animation for expanding to full screen */
+/* Animation for expanding to full screen - optimized */
 @keyframes expand-to-full {
   0% {
     transform: scale(1);
     border-radius: 16px;
-    opacity: 1;
-  }
-  25% {
-    transform: scale(1.02);
-    border-radius: 12px;
-    opacity: 0.98;
   }
   50% {
-    transform: scale(1.05);
-    border-radius: 8px;
-    opacity: 0.95;
-  }
-  75% {
     transform: scale(1.02);
-    border-radius: 4px;
-    opacity: 0.98;
+    border-radius: 8px;
   }
   100% {
     transform: scale(1);
     border-radius: 0;
-    opacity: 1;
   }
 }
 
@@ -136,7 +125,6 @@ input:focus {
   padding: 32px 24px 24px 24px !important;
   border-bottom: 1px solid rgba(229, 231, 235, 0.5) !important;
   background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(20px) !important;
   position: relative;
   z-index: 1;
 }
@@ -156,31 +144,19 @@ input:focus {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Search icon shine animation */
+/* Search icon shine animation - optimized */
 @keyframes search-icon-shine {
-  0% {
-    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.3));
+  0%, 100% {
     transform: scale(1);
-  }
-  25% {
-    filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.5)) drop-shadow(0 0 20px rgba(139, 92, 246, 0.2));
-    transform: scale(1.05);
+    filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.4));
   }
   50% {
-    filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.6)) drop-shadow(0 0 25px rgba(139, 92, 246, 0.3));
-    transform: scale(1.08);
-  }
-  75% {
-    filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.5)) drop-shadow(0 0 20px rgba(139, 92, 246, 0.2));
     transform: scale(1.05);
-  }
-  100% {
-    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.3));
-    transform: scale(1);
+    filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.6));
   }
 }
 
-/* Enhanced search icon for full screen mode */
+/* Enhanced search icon for full screen mode - simplified */
 .search-container.dropdown-open .w-5.h-5 {
   position: relative;
 }
@@ -188,24 +164,24 @@ input:focus {
 .search-container.dropdown-open .w-5.h-5::before {
   content: '';
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05), rgba(139, 92, 246, 0.1));
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
   border-radius: 50%;
   z-index: -1;
-  animation: search-icon-glow 3s ease-in-out infinite;
+  animation: search-icon-glow 2s ease-in-out infinite;
 }
 
 @keyframes search-icon-glow {
   0%, 100% {
-    opacity: 0.3;
+    opacity: 0.4;
     transform: scale(1);
   }
   50% {
-    opacity: 0.6;
-    transform: scale(1.2);
+    opacity: 0.7;
+    transform: scale(1.1);
   }
 }
 
@@ -248,8 +224,7 @@ input:focus {
   transition: all 0.2s ease !important;
   position: relative;
   display: block !important;
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(10px) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
 }
 
 .search-container.dropdown-open ~ .unified-dropdown .dropdown-item:hover {
@@ -356,7 +331,6 @@ input:focus {
   padding: 0 !important;
   overflow-y: auto !important;
   background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(20px) !important;
 }
 
 /* Ensure no gaps in the parent container */

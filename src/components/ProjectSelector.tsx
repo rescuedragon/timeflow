@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import './project-selector/AppleSearchBar.css';
+import './project-selector/no-highlight.css';
+import './project-selector/enhanced-styles.css';
 
 interface Project {
   id: string;
@@ -31,6 +33,7 @@ interface ProjectSelectorProps {
   quickStartCombinations: QuickStartItem[];
   projectFrequency: Record<string, number>;
   subprojectFrequency: Record<string, Record<string, number>>;
+  isTimerRunning?: boolean; // New prop to indicate if timer is running
 }
 
 const ProjectSelector: React.FC<ProjectSelectorProps> = ({
@@ -43,7 +46,8 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   frequentlyUsedProjects,
   quickStartCombinations,
   projectFrequency,
-  subprojectFrequency
+  subprojectFrequency,
+  isTimerRunning = false // Default to false if not provided
 }) => {
   const [activeTab, setActiveTab] = useState<'quick' | 'frequent'>('frequent');
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
@@ -56,35 +60,42 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   const [projectSearchQuery, setProjectSearchQuery] = useState('');
   const [subprojectSearchQuery, setSubprojectSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Refs
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Removed auto-unselect timer - project and subproject selection should persist
-
-  // Clear search queries when project/subproject are deselected
+  // Timer for auto-unselect - only if timer is not running
   useEffect(() => {
-    if (!selectedProject) {
-      setProjectSearchQuery('');
-      setSubprojectSearchQuery('');
+    let timer: NodeJS.Timeout;
+
+    // Only auto-unselect if a project and subproject are selected but the timer isn't running
+    // This is determined by checking if the parent component has passed a non-empty selectedProject and selectedSubproject
+    // but the timer hasn't been started within 10 seconds
+    if (selectedProject && selectedSubproject) {
+      // Only auto-unselect if the timer is not running
+      if (!isTimerRunning) {
+        console.log('Starting auto-unselect timer because timer is not running');
+        timer = setTimeout(() => {
+          console.log('Auto-unselecting project and subproject after 10 seconds');
+          onProjectSelect(null);
+          onSubprojectSelect('');
+        }, 10000);
+      } else {
+        console.log('Not starting auto-unselect timer because timer is running');
+      }
     }
-    if (!selectedSubproject) {
-      setSubprojectSearchQuery('');
-    }
-  }, [selectedProject, selectedSubproject]);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [selectedProject, selectedSubproject, onProjectSelect, onSubprojectSelect]);
 
   // Handle click outside to remove focus
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
-        // Check if click is on the close button (×)
-        const target = e.target as HTMLElement;
-        if (target.textContent === '×' || target.closest('.close-button')) {
-          return; // Don't close if clicking the close button
-        }
-        
-        setIsSearchFocused(false);
         setShowProjectDropdown(false);
         setShowSubprojectDropdown(false);
       }
@@ -93,15 +104,6 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
-
-  // Handle close button click for full screen mode
-  const handleCloseFullScreen = () => {
-    setIsSearchFocused(false);
-    setShowProjectDropdown(false);
-    setShowSubprojectDropdown(false);
-    setProjectDropdownIndex(-1);
-    setSubprojectDropdownIndex(-1);
-  };
 
   // Filter projects based on search query
   const filteredProjects = projects.filter(project =>
@@ -202,51 +204,82 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   return (
     <div className="w-1/2 bg-white/98 backdrop-blur-2xl border border-white/30 shadow-lg rounded-2xl h-[612px] overflow-hidden" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
       {/* Apple-Style Header Section */}
-      <div className="bg-gradient-to-b from-white/95 to-white/85 backdrop-blur-xl border-b border-white/40 p-6 relative">
-        <div className="relative">
+      <div className="bg-gradient-to-b from-white/95 to-white/85 backdrop-blur-xl border-b border-white/40 p-6 relative z-50">
+        <div className="flex items-center gap-5">
           {/* New Apple-Style Search Bar */}
           <div
             ref={searchContainerRef}
-            className={`search-container w-full flex items-center bg-white border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] ${
-              isSearchFocused ? 'focused' : ''
-            } ${
-              (showProjectDropdown || showSubprojectDropdown) ? 'dropdown-open expanded-search' : 'rounded-2xl'
-            }`}
-            style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
-            onClick={(e) => {
-              // Handle close button click
-              const target = e.target as HTMLElement;
-              if (target.textContent === '×' || target.closest('.close-button')) {
-                handleCloseFullScreen();
-                return;
-              }
-              
+            className={`w-full flex items-center bg-white rounded-2xl border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] search-container ${isSearchFocused ? 'focused' : ''} ${isDropdownOpen ? 'dropdown-open' : ''}`}
+            style={{
+              transition: 'box-shadow 0.2s ease',
+              WebkitTapHighlightColor: 'transparent',
+              outline: 'none'
+            }}
+            onClick={() => {
               if (inputRef.current) {
                 inputRef.current.focus();
               }
             }}
           >
-            <div className="px-4 py-3 flex items-center w-full">
+            <div className={`px-4 py-3 flex items-center w-full ${isDropdownOpen ? 'pt-8 pb-6' : ''}`}>
               <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
+              {isDropdownOpen && (
+                <button
+                  className="close-button"
+                  style={{
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    width: '32px',
+                    height: '32px',
+                    background: 'rgba(0, 0, 0, 0.1)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10001
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsDropdownOpen(false);
+                    setIsSearchFocused(false);
+                    if (inputRef.current) {
+                      inputRef.current.blur();
+                    }
+                  }}
+                >
+                  <span style={{ fontSize: '24px', fontWeight: 300 }}>×</span>
+                </button>
+              )}
               <input
                 ref={inputRef}
                 type="text"
-                className="flex-1 border-none outline-none text-gray-700 placeholder-gray-400 text-base mx-2 bg-transparent"
+                className="flex-1 border-none outline-none text-gray-700 placeholder-gray-400 text-base mx-2 bg-transparent focus:ring-0 focus:ring-offset-0"
                 placeholder={placeholder}
                 value={selectedProject ? subprojectSearchQuery : projectSearchQuery}
+                style={{
+                  WebkitTapHighlightColor: 'transparent',
+                  outline: 'none',
+                  boxShadow: 'none'
+                }}
                 onChange={(e) => {
                   if (!selectedProject) {
                     setProjectSearchQuery(e.target.value);
                     setShowProjectDropdown(true);
+                    setIsDropdownOpen(true);
+                    setIsSearchFocused(true);
                     setProjectDropdownIndex(-1);
                   } else {
                     setSubprojectSearchQuery(e.target.value);
                     setShowSubprojectDropdown(true);
+                    setIsDropdownOpen(true);
+                    setIsSearchFocused(true);
                     setSubprojectDropdownIndex(-1);
                   }
                 }}
                 onFocus={() => {
                   setIsSearchFocused(true);
+                  setIsDropdownOpen(true);
                   if (!selectedProject) {
                     setShowProjectDropdown(true);
                     setProjectDropdownIndex(-1);
@@ -257,16 +290,20 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                 }}
                 onBlur={() => {
                   setTimeout(() => {
+                    // Keep dropdowns visible for a moment to allow clicking
                     setIsSearchFocused(false);
+                    setIsDropdownOpen(false);
+                    setShowProjectDropdown(false);
+                    setShowSubprojectDropdown(false);
                   }, 200);
                 }}
                 onKeyDown={!selectedProject ? handleProjectKeyDown : handleSubprojectKeyDown}
                 autoComplete="off"
               />
-              <div className={`flex items-center ml-3 pl-3 border-l border-gray-200 ${isSearchFocused ? 'opacity-0 invisible' : 'opacity-100 visible'}`} 
+              <div className="flex items-center ml-3 pl-3 border-l border-gray-200"
                 style={{ transition: 'opacity 0.2s ease, visibility 0.2s ease' }}>
                 <button
-                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${activeTab === 'frequent' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'
+                  className={`px-4 py-2 text-sm font-semibold transition-all duration-200 relative tab-button ${activeTab === 'frequent' ? 'text-purple-600' : 'text-gray-500 hover:text-purple-500'
                     }`}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -274,9 +311,12 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                   }}
                 >
                   Frequently Used
+                  {activeTab === 'frequent' && (
+                    <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-purple-400 to-purple-600 rounded-t-full tab-indicator" />
+                  )}
                 </button>
                 <button
-                  className={`px-3 py-1 rounded-full text-sm font-medium ml-2 transition-colors ${activeTab === 'quick' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'
+                  className={`px-4 py-2 text-sm font-semibold transition-all duration-200 relative ml-2 tab-button ${activeTab === 'quick' ? 'text-purple-600' : 'text-gray-500 hover:text-purple-500'
                     }`}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -284,47 +324,38 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                   }}
                 >
                   QuickStart
+                  {activeTab === 'quick' && (
+                    <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-purple-400 to-purple-600 rounded-t-full tab-indicator" />
+                  )}
                 </button>
               </div>
-              
-              {/* Close button for full screen mode */}
-              {(showProjectDropdown || showSubprojectDropdown) && (
-                <button
-                  className="close-button absolute top-6 right-6 w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all duration-200 z-[10001]"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCloseFullScreen();
-                  }}
-                >
-                  <span className="text-gray-600 text-lg font-light">×</span>
-                </button>
-              )}
             </div>
-
           </div>
 
           {/* Standard Project Dropdown */}
           {!selectedProject && showProjectDropdown && (
-            <div className="unified-dropdown absolute top-full left-0 right-0 bg-white rounded-b-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-200 z-50 animate-dropdown-enter overflow-hidden">
-              <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-3">
+            <div className={`absolute top-full left-6 right-6 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 z-50 unified-dropdown ${isDropdownOpen ? 'dropdown-fullscreen' : ''}`}>
+              <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-2">
                 {filteredProjects.map((project, index) => (
                   <div
                     key={project.id}
-                    className={`dropdown-item px-4 py-3 cursor-pointer ${index === projectDropdownIndex ? 'selected' : ''} animate-dropdown-item`}
-                    style={{ animationDelay: `${index * 50}ms` }}
+                    className={`px-4 py-2 cursor-pointer hover:bg-gray-50 dropdown-item ${index === projectDropdownIndex ? 'bg-gray-50 selected' : ''
+                      }`}
                     onClick={() => {
                       onProjectSelect(project);
                       setProjectSearchQuery(project.name);
                       setShowProjectDropdown(false);
+                      setIsDropdownOpen(false);
+                      setIsSearchFocused(false);
                       setProjectDropdownIndex(-1);
                     }}
                   >
-                    <div className="text-sm font-medium text-slate-800 tracking-tight">{project.name}</div>
+                    <div className="text-sm font-medium text-slate-800">{project.name}</div>
                   </div>
                 ))}
                 {filteredProjects.length === 0 && (
-                  <div className="px-4 py-8 text-center animate-dropdown-item">
-                    <div className="text-sm text-slate-500 font-medium">No projects found</div>
+                  <div className="px-4 py-6 text-center">
+                    <div className="text-sm text-slate-500">No projects found</div>
                   </div>
                 )}
               </div>
@@ -333,28 +364,30 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
           {/* Subproject Dropdown */}
           {selectedProject && !selectedSubproject && showSubprojectDropdown && (
-            <div className="unified-dropdown absolute top-full left-0 right-0 bg-white rounded-b-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-200 z-50 animate-dropdown-enter overflow-hidden">
-              <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-3">
+            <div className={`absolute top-full left-6 right-6 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 z-50 unified-dropdown ${isDropdownOpen ? 'dropdown-fullscreen' : ''}`}>
+              <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-2">
                 {filteredSubprojects.map((subproject, index) => {
                   return (
                     <div
                       key={index}
-                      className={`dropdown-item px-4 py-3 cursor-pointer ${index === subprojectDropdownIndex ? 'selected' : ''} animate-dropdown-item`}
-                      style={{ animationDelay: `${index * 50}ms` }}
+                      className={`px-4 py-2 cursor-pointer hover:bg-gray-50 dropdown-item ${index === subprojectDropdownIndex ? 'bg-gray-50 selected' : ''
+                        }`}
                       onClick={() => {
                         onSubprojectSelect(subproject);
                         setSubprojectSearchQuery(subproject);
                         setShowSubprojectDropdown(false);
+                        setIsDropdownOpen(false);
+                        setIsSearchFocused(false);
                         setSubprojectDropdownIndex(-1);
                       }}
                     >
-                      <div className="text-sm font-medium text-slate-800 tracking-tight">{subproject}</div>
+                      <div className="text-sm font-medium text-slate-800">{subproject}</div>
                     </div>
                   );
                 })}
                 {filteredSubprojects.length === 0 && (
-                  <div className="px-4 py-8 text-center animate-dropdown-item">
-                    <div className="text-sm text-slate-500 font-medium">No tasks found</div>
+                  <div className="px-4 py-6 text-center">
+                    <div className="text-sm text-slate-500">No tasks found</div>
                   </div>
                 )}
               </div>
@@ -398,54 +431,57 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
         {/* Show Frequently Used Projects when no project is selected and activeTab is 'frequent' */}
         {!selectedProject && activeTab === 'frequent' && (
           <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mb-6">
-            <div className="h-full overflow-y-auto">
+            <div className="h-full overflow-y-auto p-3">
               {frequentlyUsedProjects.length > 0 ? (
-                <div className="divide-y divide-slate-100/40">
+                <div className="space-y-3 p-3">
                   {frequentlyUsedProjects.map((project) => (
                     <div
                       key={project.id}
                       className="group"
                     >
-                      <button
-                        className="w-full px-6 py-5 text-left hover:bg-slate-50/60 active:bg-slate-100/40 transition-all duration-200 flex items-center justify-between"
-                        onClick={() => {
-                          const expandedProjectId = expandedProject === project.id ? null : project.id;
-                          setExpandedProject(expandedProjectId);
-                        }}
-                      >
-                        <div className="font-medium text-base text-slate-700 group-hover:text-purple-600 transition-colors duration-200">{project.name}</div>
-                        <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expandedProject === project.id ? 'rotate-90' : ''
-                          }`} />
-                      </button>
+                      <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border-l-4 border-gray-200 category-card">
+                        <button
+                          className="w-full px-5 py-4 text-left transition-all duration-200 flex items-center justify-between"
+                          onClick={() => {
+                            const expandedProjectId = expandedProject === project.id ? null : project.id;
+                            setExpandedProject(expandedProjectId);
+                          }}
+                        >
+                          <div className="font-medium text-base text-slate-700 group-hover:text-purple-600 transition-colors duration-200">{project.name}</div>
+                          <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expandedProject === project.id ? 'rotate-90' : ''
+                            }`} />
+                        </button>
 
-                      {/* Subprojects list - shown when expanded */}
-                      <div className={`overflow-hidden transition-all duration-200 ${expandedProject === project.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                        }`}>
-                        <div className="bg-slate-50/30 border-t border-slate-100/30">
-                          {project.subprojects
-                            .sort((a, b) => {
-                              const aFreq = subprojectFrequency[project.id]?.[a] || 0;
-                              const bFreq = subprojectFrequency[project.id]?.[b] || 0;
-                              return bFreq - aFreq;
-                            })
-                            .map((subproject, idx) => (
-                              <button
-                                key={idx}
-                                className="w-full px-6 py-4 pl-12 text-left hover:bg-purple-50/40 active:bg-purple-100/30 transition-all duration-200 border-b border-slate-100/20 last:border-b-0 group/subtask flex justify-between items-center"
-                                onClick={() => {
-                                  onProjectSelect(project);
-                                  onSubprojectSelect(subproject);
-                                  setProjectSearchQuery(project.name);
-                                  setSubprojectSearchQuery(subproject);
-                                }}
-                              >
-                                <div className="text-sm text-slate-600 group-hover/subtask:text-purple-600 font-normal transition-colors duration-200">{subproject}</div>
-                                <div className="text-xs text-slate-400">
-                                  {subprojectFrequency[project.id]?.[subproject] || 0} uses
+                        {/* Subprojects list - shown when expanded */}
+                        <div className={`overflow-hidden transition-all duration-200 ${expandedProject === project.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                          }`}>
+                          <div className="bg-slate-50/30 border-t border-slate-100/30 pt-2 pb-1 px-2">
+                            {project.subprojects
+                              .sort((a, b) => {
+                                const aFreq = subprojectFrequency[project.id]?.[a] || 0;
+                                const bFreq = subprojectFrequency[project.id]?.[b] || 0;
+                                return bFreq - aFreq;
+                              })
+                              .map((subproject, idx) => (
+                                <div key={idx} className="mb-2 mx-2">
+                                  <button
+                                    className="w-full px-4 py-3 pl-8 text-left bg-white rounded-md hover:bg-purple-50/70 active:bg-purple-100/50 transition-all duration-200 group/subtask flex justify-between items-center shadow-sm hover:shadow subproject-card"
+                                    onClick={() => {
+                                      onProjectSelect(project);
+                                      onSubprojectSelect(subproject);
+                                      setProjectSearchQuery(project.name);
+                                      setSubprojectSearchQuery(subproject);
+                                    }}
+                                  >
+                                    <div className="text-sm text-slate-600 group-hover/subtask:text-purple-600 font-normal transition-colors duration-200">{subproject}</div>
+                                    <div className="text-xs text-slate-400">
+                                      {subprojectFrequency[project.id]?.[subproject] || 0} uses
+                                    </div>
+                                  </button>
                                 </div>
-                              </button>
-                            ))
-                          }
+                              ))
+                            }
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -453,8 +489,8 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                 </div>
               ) : (
                 <div className="text-center text-slate-400 py-20">
-                  <div className="w-12 h-12 bg-slate-100/60 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-6 h-6 text-slate-400" />
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-100 to-purple-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                    <Search className="w-6 h-6 text-purple-500" />
                   </div>
                   <h3 className="text-lg font-medium mb-2 text-slate-600">No frequently used projects</h3>
                   <p className="text-sm text-slate-500">Start using projects to see them here</p>
@@ -469,8 +505,8 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
           <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mb-6">
             <div className="h-full flex items-center justify-center">
               <div className="text-center text-slate-400 py-20">
-                <div className="w-12 h-12 bg-slate-100/60 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-100 to-purple-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>

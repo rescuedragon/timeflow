@@ -1,0 +1,91 @@
+/* Enhanced Tab and Category List Styles */
+
+/* Tab Section Enhancements */
+.tab-button {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  color: rgba(139, 92, 246, 0.8);
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(to right, #9333ea, #7e22ce);
+  border-radius: 3px 3px 0 0;
+  transition: all 0.3s ease;
+}
+
+/* Category Card Styles */
+.category-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 16px 20px;
+  border-left: 4px solid #e5e7eb;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+}
+
+.category-card:hover {
+  background-color: rgba(139, 92, 246, 0.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transform: translateY(-1px);
+}
+
+/* Focus states for keyboard navigation */
+.tab-button:focus-visible,
+.category-card:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.5);
+  outline-offset: 2px;
+}
+
+/* Subproject card styles */
+.subproject-card {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.subproject-card:hover {
+  background-color: rgba(139, 92, 246, 0.08);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+}
+
+/* Fullscreen dropdown positioning */
+.dropdown-fullscreen {
+  position: fixed !important;
+  top: 120px !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: white !important;
+  z-index: 10000 !important;
+}
+
+.dropdown-fullscreen .dropdown-item {
+  padding: 16px 24px !important;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.3) !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  background-color: white !important;
+}
+
+.dropdown-fullscreen .dropdown-item:hover,
+.dropdown-fullscreen .dropdown-item.selected {
+  background-color: rgba(139, 92, 246, 0.08) !important;
+  padding-left: 32px !important;
+}
