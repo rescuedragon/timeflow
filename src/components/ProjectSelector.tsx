@@ -233,11 +233,18 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
               WebkitTapHighlightColor: 'transparent',
               outline: 'none'
             }}
-            onClick={() => {
-              if (inputRef.current) {
-                inputRef.current.focus();
-              }
-            }}
+                            onClick={() => {
+                  if (inputRef.current) {
+                    inputRef.current.focus();
+                  }
+                  // Deselect project and subproject when clicking inside search
+                  if (selectedProject || selectedSubproject) {
+                    onProjectSelect(null);
+                    onSubprojectSelect('');
+                    setProjectSearchQuery('');
+                    setSubprojectSearchQuery('');
+                  }
+                }}
           >
             <div className={`px-4 py-3 flex items-center w-full ${isDropdownOpen ? 'pt-8 pb-6' : ''}`}>
               <Search className={`w-5 h-5 text-gray-400 flex-shrink-0 ${searchIconAnimate ? 'search-icon-animate' : ''}`} />
@@ -298,13 +305,16 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                 onFocus={() => {
                   setIsSearchFocused(true);
                   setIsDropdownOpen(true);
-                  if (!selectedProject) {
-                    setShowProjectDropdown(true);
-                    setProjectDropdownIndex(-1);
-                  } else {
-                    setShowSubprojectDropdown(true);
-                    setSubprojectDropdownIndex(-1);
+                  // Deselect project and subproject when focusing on search
+                  if (selectedProject || selectedSubproject) {
+                    onProjectSelect(null);
+                    onSubprojectSelect('');
+                    setProjectSearchQuery('');
+                    setSubprojectSearchQuery('');
                   }
+                  // Show project dropdown when focusing
+                  setShowProjectDropdown(true);
+                  setProjectDropdownIndex(-1);
                 }}
                 onBlur={() => {
                   setTimeout(() => {
