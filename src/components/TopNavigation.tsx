@@ -1,12 +1,13 @@
 import React from 'react';
-import { Timer, FileText, CheckSquare, Calendar } from 'lucide-react';
+import { Timer, FileText, CheckSquare, Calendar, LogOut } from 'lucide-react';
 
 interface TopNavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  onLogout?: () => void;
 }
 
-const TopNavigation: React.FC<TopNavigationProps> = ({ activeTab, onTabChange }) => {
+const TopNavigation: React.FC<TopNavigationProps> = ({ activeTab, onTabChange, onLogout }) => {
   const tabs = [
     {
       id: 'time-tracker',
@@ -63,6 +64,17 @@ const TopNavigation: React.FC<TopNavigationProps> = ({ activeTab, onTabChange })
                 </button>
               );
             })}
+            
+            {/* Logout Button */}
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="flex items-center gap-2 px-4 py-4 text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all duration-300 rounded-2xl"
+                title="Logout"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
       </div>

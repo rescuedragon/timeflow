@@ -155,63 +155,69 @@ const InfoBar: React.FC<InfoBarProps> = ({
                 </div>
 
                 {/* World Clocks - Equal Spacing */}
-                <div className="flex justify-between gap-16 flex-1">
+                <div className="flex justify-between gap-20 flex-1">
                   {/* India Time */}
                   <div className="timezone-section flex-1 flex justify-center">
-                    <div className="relative">
-                      <div className="w-24 h-24 analog-clock-container">
-                        <div className="clock-ring"></div>
-                        <AnalogClock timezone="Asia/Kolkata" />
-                        <div className="clock-reflection"></div>
-                        <div className="clock-highlight"></div>
+                    <div className="flex items-center space-x-6">
+                      <div className="relative">
+                        <div className="w-24 h-24 analog-clock-container">
+                          <div className="clock-ring"></div>
+                          <AnalogClock timezone="Asia/Kolkata" />
+                          <div className="clock-reflection"></div>
+                          <div className="clock-highlight"></div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex flex-col justify-center ml-4">
-                      <div className="location-label flex items-center justify-center mb-1">
-                        <MapPin className="w-2.5 h-2.5 mr-1" />
-                        <span>INDIA</span>
+                      <div className="flex flex-col justify-center">
+                        <div className="location-label flex items-center justify-center mb-1">
+                          <MapPin className="w-2.5 h-2.5 mr-1" />
+                          <span>INDIA</span>
+                        </div>
+                        <div className="time-display text-center">{getTimeZoneTime('Asia/Kolkata')}</div>
                       </div>
-                      <div className="time-display text-center">{getTimeZoneTime('Asia/Kolkata')}</div>
                     </div>
                     <div className="timezone-divider"></div>
                   </div>
 
                   {/* UK Time */}
                   <div className="timezone-section flex-1 flex justify-center">
-                    <div className="relative">
-                      <div className="w-24 h-24 analog-clock-container">
-                        <div className="clock-ring"></div>
-                        <AnalogClock timezone="Europe/London" />
-                        <div className="clock-reflection"></div>
-                        <div className="clock-highlight"></div>
+                    <div className="flex items-center space-x-6">
+                      <div className="relative">
+                        <div className="w-24 h-24 analog-clock-container">
+                          <div className="clock-ring"></div>
+                          <AnalogClock timezone="Europe/London" />
+                          <div className="clock-reflection"></div>
+                          <div className="clock-highlight"></div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex flex-col justify-center ml-4">
-                      <div className="location-label flex items-center justify-center mb-1">
-                        <MapPin className="w-2.5 h-2.5 mr-1" />
-                        <span>UK</span>
+                      <div className="flex flex-col justify-center">
+                        <div className="location-label flex items-center justify-center mb-1">
+                          <MapPin className="w-2.5 h-2.5 mr-1" />
+                          <span>UK</span>
+                        </div>
+                        <div className="time-display text-center">{getTimeZoneTime('Europe/London')}</div>
                       </div>
-                      <div className="time-display text-center">{getTimeZoneTime('Europe/London')}</div>
                     </div>
                     <div className="timezone-divider"></div>
                   </div>
 
                   {/* USA Time */}
                   <div className="timezone-section flex-1 flex justify-center">
-                    <div className="relative">
-                      <div className="w-24 h-24 analog-clock-container">
-                        <div className="clock-ring"></div>
-                        <AnalogClock timezone="America/New_York" />
-                        <div className="clock-reflection"></div>
-                        <div className="clock-highlight"></div>
+                    <div className="flex items-center space-x-6">
+                      <div className="relative">
+                        <div className="w-24 h-24 analog-clock-container">
+                          <div className="clock-ring"></div>
+                          <AnalogClock timezone="America/New_York" />
+                          <div className="clock-reflection"></div>
+                          <div className="clock-highlight"></div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex flex-col justify-center ml-4">
-                      <div className="location-label flex items-center justify-center mb-1">
-                        <MapPin className="w-2.5 h-2.5 mr-1" />
-                        <span>USA</span>
+                      <div className="flex flex-col justify-center">
+                        <div className="location-label flex items-center justify-center mb-1">
+                          <MapPin className="w-2.5 h-2.5 mr-1" />
+                          <span>USA</span>
+                        </div>
+                        <div className="time-display text-center">{getTimeZoneTime('America/New_York')}</div>
                       </div>
-                      <div className="time-display text-center">{getTimeZoneTime('America/New_York')}</div>
                     </div>
                   </div>
                 </div>

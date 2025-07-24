@@ -17,7 +17,11 @@ interface TimeEntry {
   description: string;
 }
 
-const Index = () => {
+interface IndexProps {
+  onLogout?: () => void;
+}
+
+const Index: React.FC<IndexProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('time-tracker');
   const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
 
@@ -44,7 +48,8 @@ const Index = () => {
     <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200">
       <TopNavigation 
         activeTab={activeTab} 
-        onTabChange={setActiveTab} 
+        onTabChange={setActiveTab}
+        onLogout={onLogout}
       />
       
       <div className="w-full min-h-[calc(100vh-120px)] pb-8">

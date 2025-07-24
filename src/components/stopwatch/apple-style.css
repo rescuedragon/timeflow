@@ -1,0 +1,76 @@
+/* Apple-style animations for Stopwatch */
+
+@keyframes flip {
+  0% {
+    transform: perspective(400px) rotateX(0);
+    animation-timing-function: ease-out;
+  }
+  40% {
+    transform: perspective(400px) translateZ(150px) rotateX(170deg);
+    animation-timing-function: ease-out;
+  }
+  50% {
+    transform: perspective(400px) translateZ(150px) rotateX(190deg);
+    animation-timing-function: ease-in;
+  }
+  80% {
+    transform: perspective(400px) rotateX(360deg);
+    animation-timing-function: ease-in;
+  }
+  100% {
+    transform: perspective(400px);
+    animation-timing-function: ease-in;
+  }
+}
+
+.animate-flip {
+  animation: flip 0.6s ease-in-out;
+  backface-visibility: visible !important;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s infinite ease-in-out;
+}
+
+.digit-container {
+  perspective: 1000px;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
+
+/* SF Mono font styling for digits */
+.font-sf-mono {
+  font-family: "SF Mono", SFMono-Regular, ui-monospace, "Cascadia Code", "Roboto Mono", Menlo, Monaco, Consolas, monospace;
+  letter-spacing: -0.03em;
+}
+
+/* Button hover effects */
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+
+/* Progress circle animation */
+@keyframes progress-rotate {
+  0% {
+    stroke-dashoffset: 283;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-progress {
+  animation: progress-rotate 60s linear infinite;
+}
