@@ -61,6 +61,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   const [subprojectSearchQuery, setSubprojectSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchIconAnimate, setSearchIconAnimate] = useState(false);
 
   // Refs
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -104,6 +105,18 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
+
+  // Search icon animation - only when timer is not running
+  useEffect(() => {
+    if (!isTimerRunning) {
+      const animationInterval = setInterval(() => {
+        setSearchIconAnimate(true);
+        setTimeout(() => setSearchIconAnimate(false), 600); // Animation duration
+      }, 10000); // Every 10 seconds
+
+      return () => clearInterval(animationInterval);
+    }
+  }, [isTimerRunning]);
 
   // Filter projects based on search query
   const filteredProjects = projects.filter(project =>
@@ -202,7 +215,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
       : "Search QuickStart templates...";
 
   return (
-    <div className="w-1/2 bg-white/98 backdrop-blur-2xl border border-white/30 shadow-lg rounded-2xl h-[612px] overflow-hidden" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+    <div className="w-1/2 backdrop-blur-2xl border border-white/30 shadow-lg rounded-2xl h-[612px] overflow-hidden project-selector-container" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
       {/* Apple-Style Header Section */}
       <div className="bg-gradient-to-b from-white/95 to-white/85 backdrop-blur-xl border-b border-white/40 p-6 relative z-50">
         <div className="flex items-center gap-5">
@@ -222,7 +235,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
             }}
           >
             <div className={`px-4 py-3 flex items-center w-full ${isDropdownOpen ? 'pt-8 pb-6' : ''}`}>
-              <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
+              <Search className={`w-5 h-5 text-gray-400 flex-shrink-0 ${searchIconAnimate ? 'search-icon-animate' : ''}`} />
               {isDropdownOpen && (
                 <button
                   className="close-button"

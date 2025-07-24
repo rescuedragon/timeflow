@@ -45,7 +45,7 @@ const Index: React.FC<IndexProps> = ({ onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200">
+    <div className="min-h-screen w-full index-page-background">
       <TopNavigation 
         activeTab={activeTab} 
         onTabChange={setActiveTab}
