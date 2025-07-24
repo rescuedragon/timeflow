@@ -7,7 +7,7 @@
   position: relative;
   overflow: hidden;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
   padding: 2rem;
@@ -231,7 +231,7 @@
   z-index: 5;
   width: 100%;
   max-width: 480px;
-  margin: 0 auto;
+  margin: 15vh auto 0;
   display: flex;
   justify-content: center;
   align-items: center;

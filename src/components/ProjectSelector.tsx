@@ -217,7 +217,12 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   return (
     <div className="w-1/2 backdrop-blur-2xl border border-white/30 shadow-lg rounded-2xl h-[612px] overflow-hidden project-selector-container" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
       {/* Apple-Style Header Section */}
-      <div className="bg-gradient-to-b from-white/95 to-white/85 backdrop-blur-xl border-b border-white/40 p-6 relative z-50">
+      <div
+        className="border-b border-white/40 p-6 relative z-50"
+        style={{
+          background: '#faf9fe'
+        }}
+      >
         <div className="flex items-center gap-5">
           {/* New Apple-Style Search Bar */}
           <div
@@ -411,33 +416,60 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
       {/* Premium Content Section */}
       <div className="h-full flex flex-col">
-        {/* Show selection summary when a project is selected */}
-        {selectedProject && (
-          <div className="bg-gradient-to-br from-purple-50/60 via-white/80 to-blue-50/60 border border-purple-100/30 rounded-2xl shadow-sm p-6 mt-6 mb-6 backdrop-blur-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-slate-700 tracking-tight">Selected Project</h3>
-              <Badge variant="outline" className="bg-purple-100/60 text-purple-700 border-purple-200/40 px-3 py-1 rounded-full font-medium text-xs">
-                {selectedProject.category}
-              </Badge>
-            </div>
-            <div className="space-y-2">
-              <div className="text-xl font-medium text-slate-800 leading-tight">{selectedProject.name}</div>
-              <div className="text-sm text-slate-500 font-normal">
-                {selectedProject.subprojects.length} available tasks
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {selectedSubproject && (
-          <div className="bg-gradient-to-br from-emerald-50/60 via-white/80 to-green-50/60 border border-emerald-100/30 rounded-2xl shadow-sm p-6 mt-4 mb-6 backdrop-blur-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-slate-700 tracking-tight">Selected Task</h3>
-              <Badge variant="outline" className="bg-emerald-100/60 text-emerald-700 border-emerald-200/40 px-3 py-1 rounded-full font-medium text-xs">
-                Ready to Start
-              </Badge>
+          <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mb-6">
+            <div className="h-full flex items-center justify-center p-8">
+              <div className="text-center max-w-md transform -translate-y-16">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                  <div className="bg-gradient-to-br from-purple-400 to-purple-600 w-10 h-10 rounded-xl flex items-center justify-center shadow">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="space-y-4 mb-6">
+                  <p className="text-lg text-slate-600">
+                    You have selected <span className="font-semibold text-purple-600">{selectedSubproject}</span>
+                  </p>
+                  <p className="text-base text-slate-500">
+                    from <span className="font-medium text-slate-700">{selectedProject?.name}</span>
+                  </p>
+                </div>
+                <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-50 to-white border border-purple-200/40 rounded-full">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-2 animate-pulse"></div>
+                  <span className="text-sm font-medium text-purple-700">Ready to Start</span>
+                </div>
+                <div className="mt-8 flex items-center justify-center gap-6">
+                  <button
+                    onClick={() => {
+                      onSubprojectSelect('');
+                      setSubprojectSearchQuery('');
+                    }}
+                    className="flex items-center px-4 py-2 text-sm text-slate-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200"
+                  >
+                    <ChevronRight className="w-4 h-4 rotate-180 mr-1" />
+                    Back
+                  </button>
+                  <div className="w-px h-6 bg-slate-200"></div>
+                  <button
+                    onClick={() => {
+                      onProjectSelect(null);
+                      onSubprojectSelect('');
+                      setProjectSearchQuery('');
+                      setSubprojectSearchQuery('');
+                    }}
+                    className="flex items-center px-4 py-2 text-sm text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Clear
+                  </button>
+                </div>
+              </div>
             </div>
-            <div className="text-xl font-medium text-slate-800 leading-tight">{selectedSubproject}</div>
           </div>
         )}
 
@@ -456,8 +488,8 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                         <button
                           className="w-full h-full p-4 text-center transition-all duration-200 flex flex-col items-center justify-center relative overflow-hidden rounded-xl"
                           onClick={() => {
-                            const expandedProjectId = expandedProject === project.id ? null : project.id;
-                            setExpandedProject(expandedProjectId);
+                            onProjectSelect(project);
+                            setProjectSearchQuery(project.name);
                           }}
                         >
                           {/* Project Name */}
@@ -466,53 +498,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                           </div>
                         </button>
 
-                        {/* Subprojects overlay - shown when expanded */}
-                        {expandedProject === project.id && (
-                          <div className="absolute inset-0 bg-white rounded-xl shadow-lg border border-slate-200 z-10 overflow-hidden">
-                            <div className="p-3 border-b border-slate-100 flex items-center justify-between">
-                              <h4 className="font-medium text-sm text-slate-700">{project.name}</h4>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setExpandedProject(null);
-                                }}
-                                className="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
-                              >
-                                <span className="text-xs text-slate-500">×</span>
-                              </button>
-                            </div>
-                            <div className="p-2 max-h-32 overflow-y-auto">
-                              {project.subprojects
-                                .sort((a, b) => {
-                                  const aFreq = subprojectFrequency[project.id]?.[a] || 0;
-                                  const bFreq = subprojectFrequency[project.id]?.[b] || 0;
-                                  return bFreq - aFreq;
-                                })
-                                .slice(0, 4)
-                                .map((subproject, idx) => (
-                                  <button
-                                    key={idx}
-                                    className="w-full px-3 py-2 text-left text-xs bg-slate-50 hover:bg-purple-50 rounded-lg mb-1 transition-colors duration-200 text-slate-600 hover:text-purple-600"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onProjectSelect(project);
-                                      onSubprojectSelect(subproject);
-                                      setProjectSearchQuery(project.name);
-                                      setSubprojectSearchQuery(subproject);
-                                    }}
-                                  >
-                                    {subproject}
-                                  </button>
-                                ))
-                              }
-                              {project.subprojects.length > 4 && (
-                                <div className="text-xs text-slate-400 text-center py-1">
-                                  +{project.subprojects.length - 4} more
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
+
                       </div>
                     </div>
                   ))}
@@ -548,19 +534,44 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
           </div>
         )}
 
-        {/* Show instructions when a project is selected but no subproject */}
+        {/* Show subprojects list when a project is selected but no subproject */}
         {selectedProject && !selectedSubproject && (
-          <div className="flex-1 bg-gradient-to-br from-slate-50/60 via-white/80 to-slate-100/60 border border-slate-200/30 rounded-2xl shadow-sm p-8 backdrop-blur-sm mb-6 flex items-center justify-center">
-            <div className="text-center max-w-xs">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-                <div className="bg-gradient-to-br from-purple-400 to-purple-600 w-8 h-8 rounded-lg flex items-center justify-center shadow">
-                  <ChevronRight className="w-4 h-4 text-white" />
-                </div>
+          <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mb-6">
+            <div className="h-full overflow-y-auto p-4">
+              <div className="mb-4">
+                <button
+                  onClick={() => {
+                    onProjectSelect(null);
+                    setProjectSearchQuery('');
+                  }}
+                  className="flex items-center text-sm text-purple-600 hover:text-purple-700 transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4 rotate-180 mr-1" />
+                  Back to Projects
+                </button>
               </div>
-              <h3 className="text-lg font-medium mb-3 text-slate-700 tracking-tight">Select a Task</h3>
-              <p className="text-sm text-slate-500 leading-relaxed">
-                Choose a specific task from <span className="font-medium text-purple-600">{selectedProject.name}</span> to begin tracking time
-              </p>
+              <div className="space-y-2">
+                {filteredSubprojects.map((subproject, index) => (
+                  <button
+                    key={index}
+                    className="w-full p-4 text-left bg-white rounded-xl shadow-sm hover:shadow-md hover:bg-purple-50 transition-all duration-200 border border-gray-100 hover:border-purple-200"
+                    onClick={() => {
+                      onSubprojectSelect(subproject);
+                      setSubprojectSearchQuery(subproject);
+                    }}
+                  >
+                    <div className="text-base font-medium text-slate-800 mb-1">{subproject}</div>
+                    <div className="text-sm text-slate-500">
+                      Click to select this task
+                    </div>
+                  </button>
+                ))}
+                {filteredSubprojects.length === 0 && (
+                  <div className="text-center py-12">
+                    <div className="text-slate-500">No tasks found for this project</div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
