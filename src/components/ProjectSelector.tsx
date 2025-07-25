@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, Search } from 'lucide-react';
+import { ChevronRight, Search, Pin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { arrayMove } from '@dnd-kit/sortable';
 import './project-selector/AppleSearchBar.css';
 import './project-selector/no-highlight.css';
 import './project-selector/enhanced-styles.css';
@@ -22,6 +26,13 @@ interface QuickStartItem {
   lastUsed: string;
 }
 
+interface PinnedSubproject {
+  id: string;
+  name: string;
+  projectId: string;
+  projectName: string;
+}
+
 interface ProjectSelectorProps {
   selectedProject: Project | null;
   selectedSubproject: string;
@@ -35,6 +46,26 @@ interface ProjectSelectorProps {
   subprojectFrequency: Record<string, Record<string, number>>;
   isTimerRunning?: boolean; // New prop to indicate if timer is running
 }
+
+interface SortableItemProps {
+  id: string;
+  children: React.ReactNode;
+}
+
+const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {children}
+    </div>
+  );
+};
 
 const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   selectedProject,
@@ -51,6 +82,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'quick' | 'frequent'>('frequent');
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
+  const [pinnedSubprojects, setPinnedSubprojects] = useState<PinnedSubproject[]>([]);
 
   // Dropdown states
   const [showProjectDropdown, setShowProjectDropdown] = useState(false);
@@ -68,9 +100,39 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   const [selectedQuickStartCombinations, setSelectedQuickStartCombinations] = useState<QuickStartItem[]>([]);
   const [tempQuickStartSelections, setTempQuickStartSelections] = useState<QuickStartItem[]>([]);
 
+  // DND-kit sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor)
+  );
+
   // Refs
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Handle pinning/unpinning subprojects
+  const handlePinToggle = (subprojectName: string, projectId: string, projectName: string) => {
+    const id = `${projectId}-${subprojectName}`;
+    setPinnedSubprojects(prev => {
+      if (prev.some(item => item.id === id)) {
+        return prev.filter(item => item.id !== id);
+      } else {
+        return [...prev, { id, name: subprojectName, projectId: projectId, projectName: projectName }];
+      }
+    });
+  };
+
+  // Handle drag end for reordering pinned subprojects
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (active.id !== over?.id) {
+      setPinnedSubprojects((items) => {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over?.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
 
   // Timer for auto-unselect - only if timer is not running
   useEffect(() => {
@@ -131,7 +193,8 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   // Get subprojects sorted by frequency when a project is selected
   const filteredSubprojects = selectedProject
     ? selectedProject.subprojects
-      .filter(sub => sub.toLowerCase().includes(subprojectSearchQuery.toLowerCase()))
+      .filter(sub => sub.toLowerCase().includes(subprojectSearchQuery.toLowerCase()) &&
+        !pinnedSubprojects.some(pinned => pinned.name === sub && pinned.projectId === selectedProject.id))
       .sort((a, b) => {
         const aFreq = subprojectFrequency[selectedProject.id]?.[a] || 0;
         const bFreq = subprojectFrequency[selectedProject.id]?.[b] || 0;
@@ -782,22 +845,80 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                   Back to Projects
                 </button>
               </div>
+
+              {/* Pinned Subprojects Section */}
+              {pinnedSubprojects.length > 0 && (
+                <div className="mb-4 pb-4 border-b border-gray-200">
+                  <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">Pinned</h4>
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={pinnedSubprojects.map(item => item.id)} strategy={verticalListSortingStrategy}>
+                      <div className="space-y-2 subproject-list-container">
+                        {pinnedSubprojects.map((item) => (
+                          <SortableItem key={item.id} id={item.id}>
+                            <button
+                              className="w-full p-4 text-left bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 transition-all duration-200 border border-gray-200 subproject-item"
+                              onClick={() => {
+                                if (isTimerRunning) {
+                                  return; // Don't allow subproject selection when timer is running
+                                }
+                                onProjectSelect(projects.find(p => p.id === item.projectId) || null);
+                                onSubprojectSelect(item.name);
+                                setSubprojectSearchQuery(item.name);
+                              }}
+                            >
+                              <div className="flex items-center justify-between w-full">
+                                <div className="text-base font-medium text-slate-800">{item.name}</div>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handlePinToggle(item.name, item.projectId, item.projectName);
+                                  }}
+                                  className="ml-2 text-gray-400 hover:text-purple-600 transition-colors"
+                                >
+                                  <Pin className="w-4 h-4 fill-current" />
+                                </button>
+                              </div>
+                            </button>
+                          </SortableItem>
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
+                </div>
+              )}
+
               <div className="space-y-2 subproject-list-container">
-                {filteredSubprojects.map((subproject, index) => (
-                  <button
-                    key={index}
-                    className="w-full p-4 text-left bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 transition-all duration-200 border border-gray-200 subproject-item"
-                    onClick={() => {
-                      if (isTimerRunning) {
-                        return; // Don't allow subproject selection when timer is running
-                      }
-                      onSubprojectSelect(subproject);
-                      setSubprojectSearchQuery(subproject);
-                    }}
-                  >
-                    <div className="text-base font-medium text-slate-800">{subproject}</div>
-                  </button>
-                ))}
+                {filteredSubprojects.map((subproject, index) => {
+                  const isPinned = pinnedSubprojects.some(item => item.name === subproject && item.projectId === selectedProject?.id);
+                  return (
+                    <button
+                      key={index}
+                      className="w-full p-4 text-left bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 transition-all duration-200 border border-gray-200 subproject-item"
+                      onClick={() => {
+                        if (isTimerRunning) {
+                          return; // Don't allow subproject selection when timer is running
+                        }
+                        onSubprojectSelect(subproject);
+                        setSubprojectSearchQuery(subproject);
+                      }}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div className="text-base font-medium text-slate-800">{subproject}</div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (selectedProject) {
+                              handlePinToggle(subproject, selectedProject.id, selectedProject.name);
+                            }
+                          }}
+                          className="ml-2 text-gray-400 hover:text-purple-600 transition-colors"
+                        >
+                          <Pin className={`w-4 h-4 ${isPinned ? 'fill-purple-600' : ''}`} />
+                        </button>
+                      </div>
+                    </button>
+                  );
+                })}
                 {filteredSubprojects.length === 0 && (
                   <div className="text-center py-12">
                     <div className="text-slate-500">No tasks found for this project</div>

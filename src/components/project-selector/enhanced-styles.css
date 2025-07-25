@@ -587,8 +587,8 @@ button.bg-white.rounded-xl.shadow-sm:hover {
   background: white;
   border: 1px solid #e5e7eb; /* Light gray border */
   border-radius: 8px;
-  padding: 14px 16px; /* Increased padding for more height */
-  margin-bottom: 8px;
+  padding: 16px 20px; /* Increased padding for more height and horizontal space */
+  margin-bottom: 12px; /* Increased margin for more vertical spacing */
   transition: all 0.2s ease-in-out;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
@@ -619,4 +619,42 @@ button.bg-white.rounded-xl.shadow-sm:hover {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   background-color: #f3f4f6; /* Even lighter gray on active */
   border-color: #e5e7eb;
+}
+
+/* Pinned Subproject Styles */
+.pinned-subproject-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.subproject-item .pin-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.subproject-item .pin-button:hover {
+  background-color: rgba(126, 34, 206, 0.1);
+}
+
+.subproject-item .pin-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Drag and Drop Styles */
+.sortable-item.dragging {
+  opacity: 0.8;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
 }
