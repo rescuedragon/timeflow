@@ -3,6 +3,7 @@ import InfoBar from './InfoBar';
 import ProjectSelector from './ProjectSelector';
 import Stopwatch from './Stopwatch';
 import TimeLogModal from './TimeLogModal';
+import PausedTimers from './PausedTimers';
 
 interface Project {
   id: string;
@@ -31,6 +32,16 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged, dailyTimeEntrie
     endTime: Date;
     totalSeconds: number;
   } | null>(null);
+
+  // Paused timers state
+  const [pausedTimers, setPausedTimers] = useState<Array<{
+    id: string;
+    project: Project;
+    subproject: string;
+    startTime: Date;
+    pausedTime: Date;
+    totalSeconds: number;
+  }>>([]);
 
   // Frequency tracking (simulate with static data for now)
   const [projectFrequency] = useState<Record<string, number>>({
@@ -262,11 +273,78 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged, dailyTimeEntrie
   };
 
   const handlePause = () => {
+    if (!selectedProject || !startTime) return;
+    
     setIsPaused(true);
+    
+    // Add to paused timers
+    const pausedTimer = {
+      id: Date.now().toString(),
+      project: selectedProject,
+      subproject: selectedSubproject,
+      startTime: startTime,
+      pausedTime: new Date(),
+      totalSeconds: time
+    };
+    
+    setPausedTimers(prev => [...prev, pausedTimer]);
+    
+    // Reset timer and deselect project/subproject when timer is paused
+    setTime(0);
+    setIsRunning(false);
+    setIsPaused(false);
+    setStartTime(null);
+    setSelectedProject(null);
+    setSelectedSubproject('');
   };
 
-  const handleResume = () => {
+  const handleMainTimerResume = () => {
     setIsPaused(false);
+  };
+
+  const handleResume = (timerId: string) => {
+    // Find the paused timer
+    const pausedTimer = pausedTimers.find(t => t.id === timerId);
+    if (!pausedTimer) return;
+    
+    // Set the current timer to this paused timer's data
+    setSelectedProject(pausedTimer.project);
+    setSelectedSubproject(pausedTimer.subproject);
+    setStartTime(pausedTimer.startTime);
+    setTime(pausedTimer.totalSeconds);
+    setIsPaused(false);
+    setIsRunning(true);
+    
+    // Remove from paused timers
+    setPausedTimers(prev => prev.filter(t => t.id !== timerId));
+  };
+
+  const handlePausedTimerStop = (timerId: string) => {
+    // Find the paused timer
+    const pausedTimer = pausedTimers.find(t => t.id === timerId);
+    if (!pausedTimer) return;
+    
+    const endTime = new Date();
+    
+    // Store the time log data for the modal
+    setPendingTimeLog({
+      project: pausedTimer.project,
+      subproject: pausedTimer.subproject,
+      startTime: pausedTimer.startTime,
+      endTime: endTime,
+      totalSeconds: pausedTimer.totalSeconds
+    });
+    
+    // Show the time log modal
+    setShowTimeLogModal(true);
+    
+    // Remove from paused timers
+    setPausedTimers(prev => prev.filter(t => t.id !== timerId));
+  };
+
+  const handlePausedTimerDiscard = (timerId: string) => {
+    // Simply remove from paused timers without saving
+    setPausedTimers(prev => prev.filter(t => t.id !== timerId));
   };
 
   const handleStop = () => {
@@ -368,12 +446,22 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged, dailyTimeEntrie
               dailyLoggedSeconds={dailyLoggedSeconds}
               onStart={handleStart}
               onPause={handlePause}
-              onResume={handleResume}
+              onResume={handleMainTimerResume}
               onStop={handleStop}
             />
           </div>
         </div>
       </div>
+
+      {/* Paused Timers Section */}
+      <PausedTimers
+        pausedTimers={pausedTimers}
+        isTimerRunning={isRunning}
+        onResume={handleResume}
+        onStop={handlePausedTimerStop}
+        onDiscard={handlePausedTimerDiscard}
+        onTimeLogSave={handleTimeLogSave}
+      />
 
       {/* Time Log Modal */}
       {showTimeLogModal && pendingTimeLog && (

@@ -176,6 +176,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   };
 
   const handleQuickStartItemClick = (item: QuickStartItem) => {
+    if (isTimerRunning) {
+      return; // Don't allow quick start when timer is running
+    }
     onQuickStart(item);
   };
 
@@ -203,6 +206,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
         e.preventDefault();
         if (projectDropdownIndex >= 0 && filteredProjects[projectDropdownIndex]) {
           const project = filteredProjects[projectDropdownIndex];
+          if (isTimerRunning) {
+            return; // Don't allow project selection when timer is running
+          }
           onProjectSelect(project);
           setProjectSearchQuery(project.name);
           setShowProjectDropdown(false);
@@ -239,6 +245,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
         e.preventDefault();
         if (subprojectDropdownIndex >= 0 && filteredSubprojects[subprojectDropdownIndex]) {
           const subproject = filteredSubprojects[subprojectDropdownIndex];
+          if (isTimerRunning) {
+            return; // Don't allow subproject selection when timer is running
+          }
           onSubprojectSelect(subproject);
           setSubprojectSearchQuery(subproject);
           setShowSubprojectDropdown(false);
@@ -284,6 +293,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
               }
               // Deselect project and subproject when clicking inside search
               if (selectedProject || selectedSubproject) {
+                if (isTimerRunning) {
+                  return; // Don't allow deselection when timer is running
+                }
                 onProjectSelect(null);
                 onSubprojectSelect('');
                 setProjectSearchQuery('');
@@ -512,6 +524,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                   <div className="w-px h-6 bg-slate-200"></div>
                   <button
                     onClick={() => {
+                      if (isTimerRunning) {
+                        return; // Don't allow deselection when timer is running
+                      }
                       onProjectSelect(null);
                       onSubprojectSelect('');
                       setProjectSearchQuery('');
@@ -545,6 +560,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                         <button
                           className="w-full h-full p-4 text-center transition-all duration-200 flex flex-col items-center justify-center relative overflow-hidden rounded-xl"
                           onClick={() => {
+                            if (isTimerRunning) {
+                              return; // Don't allow project selection when timer is running
+                            }
                             onProjectSelect(project);
                             setProjectSearchQuery(project.name);
                           }}
@@ -749,6 +767,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
               <div className="mb-4">
                 <button
                   onClick={() => {
+                    if (isTimerRunning) {
+                      return; // Don't allow deselection when timer is running
+                    }
                     onProjectSelect(null);
                     setProjectSearchQuery('');
                   }}
@@ -764,6 +785,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                     key={index}
                     className="w-full p-4 text-left bg-white rounded-xl shadow-sm hover:shadow-md hover:bg-purple-50 transition-all duration-200 border border-gray-100 hover:border-purple-200"
                     onClick={() => {
+                      if (isTimerRunning) {
+                        return; // Don't allow subproject selection when timer is running
+                      }
                       onSubprojectSelect(subproject);
                       setSubprojectSearchQuery(subproject);
                     }}
