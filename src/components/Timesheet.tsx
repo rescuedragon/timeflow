@@ -35,7 +35,7 @@ const ProgressBar = ({
   enabled = false,
   className = ''
 }: ProgressBarProps): JSX.Element => {
-  const progressPercentage = Math.min(currentHours / 3600 / targetHours * 100, 100);
+  const progressPercentage = 100; // Temporarily set to 100% to see animation
   const hours = (currentHours / 3600).toFixed(1);
 
   const windRef = useRef<HTMLDivElement>(null);
@@ -374,7 +374,7 @@ const ProgressBar = ({
       </div>
     ) as JSX.Element;
   }
-  
+
   return (
     <div
       ref={containerRef}
@@ -481,40 +481,38 @@ const ProgressBar = ({
       <div className="absolute top-4 left-4 z-20">
         <button
           className="bg-gray-900/90 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-800/50 shadow-md hover:bg-gray-800/90 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={parseFloat(hours) < 5}
+          disabled={false}
           onClick={() => {
-            if (parseFloat(hours) >= 5) {
-              const allTypes = [
-                'sailboat', 'motorboat', 'canoe', 'buoy', 'yacht', 'submarine',
-                'turtle', 'starfish', 'seahorse', 'crab', 'seaweed',
-                'fish', 'whale', 'shark', 'mermaid', 'jellyfish', 'dolphin', 'octopus', 'sunfish',
-                'seagull', 'pelican', 'albatross'
-              ];
+            const allTypes = [
+              'sailboat', 'motorboat', 'canoe', 'buoy', 'yacht', 'submarine',
+              'turtle', 'starfish', 'seahorse', 'crab', 'seaweed',
+              'fish', 'whale', 'shark', 'mermaid', 'jellyfish', 'dolphin', 'octopus', 'sunfish',
+              'seagull', 'pelican', 'albatross'
+            ];
 
-              const randomType = allTypes[Math.floor(Math.random() * allTypes.length)];
-              let top, speed;
+            const randomType = allTypes[Math.floor(Math.random() * allTypes.length)];
+            let top, speed;
 
-              if (['seagull', 'pelican', 'albatross'].includes(randomType)) {
-                top = Math.random() * 15 + 5;
-                speed = 15 + (Math.random() * 10);
-              } else if (['fish', 'whale', 'shark', 'mermaid', 'jellyfish', 'dolphin', 'octopus', 'sunfish'].includes(randomType)) {
-                top = Math.random() * 30 + 50;
-                speed = ['jellyfish', 'octopus'].includes(randomType) ? 30 + (Math.random() * 15) : 15 + (Math.random() * 5);
-              } else if (['turtle', 'starfish', 'seahorse', 'crab', 'seaweed'].includes(randomType)) {
-                top = Math.random() * 20 + 40;
-                speed = 25 + (Math.random() * 10);
-              } else {
-                top = Math.random() * 25 + 20;
-                speed = 20 + (Math.random() * 8 - 4);
-              }
-
-              setBoats(prev => [...prev, {
-                id: Date.now(),
-                top,
-                speed,
-                type: randomType
-              }]);
+            if (['seagull', 'pelican', 'albatross'].includes(randomType)) {
+              top = Math.random() * 15 + 5;
+              speed = 15 + (Math.random() * 10);
+            } else if (['fish', 'whale', 'shark', 'mermaid', 'jellyfish', 'dolphin', 'octopus', 'sunfish'].includes(randomType)) {
+              top = Math.random() * 30 + 50;
+              speed = ['jellyfish', 'octopus'].includes(randomType) ? 30 + (Math.random() * 15) : 15 + (Math.random() * 5);
+            } else if (['turtle', 'starfish', 'seahorse', 'crab', 'seaweed'].includes(randomType)) {
+              top = Math.random() * 20 + 40;
+              speed = 25 + (Math.random() * 10);
+            } else {
+              top = Math.random() * 25 + 20;
+              speed = 20 + (Math.random() * 8 - 4);
             }
+
+            setBoats(prev => [...prev, {
+              id: Date.now(),
+              top,
+              speed,
+              type: randomType
+            }]);
           }}
         >
           <div className="text-3xl font-bold text-white tracking-tight">{hours} hrs</div>
@@ -695,18 +693,18 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
   const calculateTotalHours = () => {
     const today = new Date().toDateString();
     const todayEntries = timeEntries.filter(entry => entry.date === today);
-    
+
     let totalMinutes = 0;
     todayEntries.forEach(entry => {
       const [hours, minutes, seconds] = entry.totalTime.split(':').map(Number);
       totalMinutes += hours * 60 + minutes + Math.round(seconds / 60);
     });
-    
+
     return totalMinutes / 60; // Convert to hours
   };
 
   const totalHours = calculateTotalHours();
-  const progressPercentage = Math.min((totalHours / 8) * 100, 100);
+  const progressPercentage = 100; // Temporarily set to 100% to see animation
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -725,7 +723,7 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
   const getWeekEntries = () => {
     const startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
-    
+
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
 
@@ -738,12 +736,12 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
   const aggregateWeeklyData = () => {
     const weekEntries = getWeekEntries();
     const projectTotals: { [key: string]: number } = {};
-    
+
     weekEntries.forEach(entry => {
       const [hours, minutes] = entry.totalTime.split(':').map(Number);
       const totalMinutes = hours * 60 + minutes;
       const projectKey = `${entry.project} - ${entry.subproject}`;
-      
+
       if (!projectTotals[projectKey]) {
         projectTotals[projectKey] = 0;
       }
@@ -776,10 +774,10 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
       {/* Progress Bar - Full Width */}
       <div className="w-full mb-8">
         <div className="max-w-7xl mx-auto px-8">
-          <ProgressBar 
+          <ProgressBar
             currentHours={totalHours * 3600}
             enabled={true}
-            color="#8B5CF6"
+            color="#0EA5E9"
             className="rounded-3xl shadow-xl border-0"
           />
         </div>
@@ -794,11 +792,10 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
               <Button
                 variant={viewMode === 'daily' ? 'default' : 'ghost'}
                 onClick={() => setViewMode('daily')}
-                className={`flex-1 rounded-xl font-medium font-system transition-all duration-300 ${
-                  viewMode === 'daily' 
-                    ? 'bg-white shadow-lg text-purple-600' 
-                    : 'text-slate-600 hover:bg-white/50'
-                }`}
+                className={`flex-1 rounded-xl font-medium font-system transition-all duration-300 ${viewMode === 'daily'
+                  ? 'bg-white shadow-lg text-purple-600'
+                  : 'text-slate-600 hover:bg-white/50'
+                  }`}
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 Daily View
@@ -806,11 +803,10 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
               <Button
                 variant={viewMode === 'weekly' ? 'default' : 'ghost'}
                 onClick={() => setViewMode('weekly')}
-                className={`flex-1 rounded-xl font-medium font-system transition-all duration-300 ${
-                  viewMode === 'weekly' 
-                    ? 'bg-white shadow-lg text-purple-600' 
-                    : 'text-slate-600 hover:bg-white/50'
-                }`}
+                className={`flex-1 rounded-xl font-medium font-system transition-all duration-300 ${viewMode === 'weekly'
+                  ? 'bg-white shadow-lg text-purple-600'
+                  : 'text-slate-600 hover:bg-white/50'
+                  }`}
               >
                 <BarChart3 className="w-4 h-4 mr-2" />
                 Weekly View
@@ -822,7 +818,7 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
               <h2 className="text-2xl font-bold text-slate-700 font-display">
                 {viewMode === 'daily' ? 'Daily Timesheet' : 'Weekly Summary'}
               </h2>
-              
+
               <div className="flex items-center gap-3">
                 <Button
                   variant="outline"
@@ -832,11 +828,11 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
-                
+
                 <div className="text-center min-w-[200px]">
                   <div className="font-semibold text-slate-700 font-system">
-                    {viewMode === 'daily' ? formatDate(currentDate) : 
-                     `Week of ${formatDate(new Date(currentDate.getTime() - currentDate.getDay() * 24 * 60 * 60 * 1000))}`}
+                    {viewMode === 'daily' ? formatDate(currentDate) :
+                      `Week of ${formatDate(new Date(currentDate.getTime() - currentDate.getDay() * 24 * 60 * 60 * 1000))}`}
                   </div>
                   {isToday(currentDate) && viewMode === 'daily' && (
                     <Badge variant="secondary" className="mt-1 bg-emerald-100 text-emerald-700 font-system">
@@ -844,7 +840,7 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
                     </Badge>
                   )}
                 </div>
-                
+
                 <Button
                   variant="outline"
                   size="sm"

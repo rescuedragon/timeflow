@@ -32,7 +32,7 @@ const Index: React.FC<IndexProps> = ({ onLogout }) => {
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'time-tracker':
-        return <TimeTracker onTimeLogged={handleTimeLogged} />;
+        return <TimeTracker onTimeLogged={handleTimeLogged} dailyTimeEntries={timeEntries} />;
       case 'timesheet':
         return <Timesheet timeEntries={timeEntries} />;
       case 'my-tasks':
@@ -40,7 +40,7 @@ const Index: React.FC<IndexProps> = ({ onLogout }) => {
       case 'holidays':
         return <Holidays />;
       default:
-        return <TimeTracker onTimeLogged={handleTimeLogged} />;
+        return <TimeTracker onTimeLogged={handleTimeLogged} dailyTimeEntries={timeEntries} />;
     }
   };
 

@@ -13,9 +13,10 @@ interface Project {
 
 interface TimeTrackerProps {
   onTimeLogged: (entry: any) => void;
+  dailyTimeEntries?: any[]; // Array of today's logged time entries
 }
 
-const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
+const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged, dailyTimeEntries = [] }) => {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -135,6 +136,39 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
   // Get quick start items sorted by frequency (for display in the UI, not in dropdown)
   const quickStartCombinations = quickStartItems
     .sort((a, b) => b.frequency - a.frequency);
+
+  // Calculate total logged seconds for today
+  const calculateDailyLoggedSeconds = () => {
+    const today = new Date();
+    const todayDateString = today.toDateString(); // "Fri Jul 25 2025"
+    
+    console.log('Today:', todayDateString);
+    console.log('Daily time entries:', dailyTimeEntries);
+    
+    const todaysEntries = dailyTimeEntries.filter(entry => {
+      // Parse the formatted date string back to a Date object and compare
+      const entryDate = new Date(entry.date);
+      const entryDateString = entryDate.toDateString();
+      console.log('Entry date string:', entry.date, '-> parsed:', entryDateString, 'matches today:', entryDateString === todayDateString);
+      return entryDateString === todayDateString;
+    });
+    
+    console.log('Todays entries:', todaysEntries);
+    
+    const totalSeconds = todaysEntries.reduce((total, entry) => {
+      console.log('Processing entry:', entry);
+      // Parse time format "HH:MM:SS" to seconds
+      const [hours, minutes, seconds] = entry.totalTime.split(':').map(Number);
+      const entrySeconds = (hours * 3600) + (minutes * 60) + seconds;
+      console.log('Entry seconds:', entrySeconds);
+      return total + entrySeconds;
+    }, 0);
+    
+    console.log('Total daily logged seconds:', totalSeconds);
+    return totalSeconds;
+  };
+
+  const dailyLoggedSeconds = calculateDailyLoggedSeconds();
     
   // Show timer active state in InfoBar only when timer is actually running
   const isTimerActive = isRunning && selectedProject && selectedSubproject;
@@ -331,6 +365,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
               isPaused={isPaused}
               selectedProject={selectedProject}
               selectedSubproject={selectedSubproject}
+              dailyLoggedSeconds={dailyLoggedSeconds}
               onStart={handleStart}
               onPause={handlePause}
               onResume={handleResume}

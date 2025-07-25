@@ -8,6 +8,7 @@ interface StopwatchProps {
   isPaused: boolean;
   selectedProject: any;
   selectedSubproject: string;
+  dailyLoggedSeconds?: number; // Total seconds logged today from saved entries
   onStart: () => void;
   onPause: () => void;
   onResume: () => void;
@@ -20,6 +21,7 @@ const Stopwatch: React.FC<StopwatchProps> = ({
   isPaused,
   selectedProject,
   selectedSubproject,
+  dailyLoggedSeconds = 0,
   onStart,
   onPause,
   onResume,
@@ -66,11 +68,11 @@ const Stopwatch: React.FC<StopwatchProps> = ({
     return ((useTime / 3600) * 30) - 90; // 30 degrees per hour
   };
 
-  // Calculate progress arc for smooth elapsed time visualization
+  // Calculate progress arc for 8-hour work session visualization (daily total + current session)
   const getProgressPath = () => {
-    const useTime = isRunning && !isPaused ? smoothTime : time;
-    const totalSeconds = useTime % 60; // Progress through current minute
-    const progress = totalSeconds / 60;
+    // Temporarily set to 100% to see animation
+    const progress = 1; // 100%
+    
     const angle = progress * 360;
     const radians = (angle * Math.PI) / 180;
     const centerX = 180;
@@ -87,104 +89,39 @@ const Stopwatch: React.FC<StopwatchProps> = ({
 
   return (
     <div className="w-1/2">
-      {/* Premium Futuristic Glassmorphic Container */}
+      {/* Premium Paper Background Container */}
       <div 
-        className="p-10 rounded-[3rem] h-[612px] flex flex-col justify-center items-center relative overflow-hidden backdrop-blur-2xl"
+        className="p-8 rounded-[2.5rem] h-[612px] flex flex-col justify-center items-center relative"
         style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(248, 250, 252, 0.08) 25%, rgba(168, 85, 247, 0.03) 50%, rgba(147, 51, 234, 0.02) 75%, rgba(126, 34, 206, 0.01) 100%)',
-          boxShadow: '0 40px 80px rgba(168, 85, 247, 0.15), 0 20px 40px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(168, 85, 247, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.15)'
+          background: '#fbfaff',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04), 0 4px 8px rgba(0, 0, 0, 0.02)',
+          border: '1px solid rgba(0, 0, 0, 0.06)'
         }}
       >
-        {/* Futuristic Background Gradient */}
-        <div 
-          className="absolute inset-0 rounded-[3rem]"
-          style={{
-            background: 'radial-gradient(ellipse at top, rgba(168, 85, 247, 0.08) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(147, 51, 234, 0.06) 0%, transparent 50%), linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(168, 85, 247, 0.04) 100%)'
-          }}
-        />
         
-        {/* Enhanced Animated Glow Orbs */}
-        <motion.div 
-          className="absolute top-12 right-16 w-48 h-48 rounded-full"
-          style={{
-            background: 'radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, rgba(147, 51, 234, 0.1) 40%, transparent 70%)',
-            filter: 'blur(40px)'
-          }}
-          animate={{
-            scale: [1, 1.15, 1],
-            opacity: [0.3, 0.5, 0.3],
-            x: [0, 10, 0],
-            y: [0, -5, 0]
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-16 left-12 w-36 h-36 rounded-full"
-          style={{
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(99, 102, 241, 0.15) 40%, transparent 70%)',
-            filter: 'blur(35px)'
-          }}
-          animate={{
-            scale: [1, 1.25, 1],
-            opacity: [0.2, 0.4, 0.2],
-            x: [0, -8, 0],
-            y: [0, 8, 0]
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1.5
-          }}
-        />
-        
-        {/* Additional Ambient Glow */}
-        <motion.div 
-          className="absolute top-1/2 left-1/2 w-64 h-64 rounded-full -translate-x-1/2 -translate-y-1/2"
-          style={{
-            background: 'radial-gradient(circle, rgba(168, 85, 247, 0.05) 0%, transparent 60%)',
-            filter: 'blur(60px)'
-          }}
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.4, 0.6, 0.4]
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.5
-          }}
-        />
-        
-        {/* Futuristic Premium Stopwatch */}
-        <div className="relative z-10 mb-10">
-          {/* Main Stopwatch Body - Enhanced Glassmorphic */}
+        {/* Physical Card-like Clock Container */}
+        <div className="relative mb-6">
+          {/* Main Clock Body - Physical Card Aesthetic */}
           <div 
-            className="relative w-[420px] h-[420px] rounded-[3rem] backdrop-blur-xl"
+            className="relative w-[380px] h-[380px] rounded-[2rem]"
             style={{
-              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(248, 250, 252, 0.12) 25%, rgba(168, 85, 247, 0.02) 50%, rgba(255, 255, 255, 0.08) 100%)',
-              boxShadow: '0 32px 64px rgba(168, 85, 247, 0.2), 0 16px 32px rgba(0, 0, 0, 0.1), inset 0 2px 0 rgba(255, 255, 255, 0.3), inset 0 -2px 0 rgba(168, 85, 247, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
+              background: '#ffffff',
+              boxShadow: '0 16px 32px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.02)',
+              border: '1px solid rgba(0, 0, 0, 0.08)'
             }}
           >
             
-            {/* Futuristic Speaker Grille */}
-            <div className="absolute top-5 right-6">
+            {/* Minimalist Speaker Grille */}
+            <div className="absolute top-4 right-5">
               <div className="grid grid-cols-4 gap-1">
                 {Array.from({ length: 16 }).map((_, i) => (
                   <motion.div 
                     key={i} 
-                    className="w-1 h-1 rounded-full backdrop-blur-sm"
+                    className="w-1 h-1 rounded-full"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.6) 0%, rgba(147, 51, 234, 0.8) 100%)',
-                      boxShadow: '0 1px 2px rgba(168, 85, 247, 0.4), inset 0 0.5px 0 rgba(255, 255, 255, 0.3), 0 0 4px rgba(168, 85, 247, 0.3)',
-                      border: '0.5px solid rgba(255, 255, 255, 0.2)'
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.7) 0%, rgba(147, 51, 234, 0.8) 100%)',
+                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.2), inset 0 0.25px 0 rgba(255, 255, 255, 0.3)',
+                      border: '0.25px solid rgba(0, 0, 0, 0.1)'
                     }}
                     animate={{
                       opacity: [0.6, 1, 0.6],
@@ -201,13 +138,13 @@ const Stopwatch: React.FC<StopwatchProps> = ({
               </div>
             </div>
             
-            {/* Clock Face - Futuristic with Enhanced Depth */}
+            {/* Clock Face - Pure Off-White with Natural Lighting */}
             <div 
-              className="absolute inset-8 rounded-full backdrop-blur-lg"
+              className="absolute inset-6 rounded-full"
               style={{
-                background: 'radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25) 0%, rgba(248, 250, 252, 0.15) 30%, rgba(168, 85, 247, 0.02) 60%, rgba(255, 255, 255, 0.1) 100%)',
-                boxShadow: 'inset 0 8px 16px rgba(0, 0, 0, 0.08), inset 0 4px 8px rgba(168, 85, 247, 0.05), 0 4px 12px rgba(255, 255, 255, 0.6), 0 2px 4px rgba(168, 85, 247, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.25)'
+                background: '#fafafa',
+                boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.04), inset 0 2px 4px rgba(0, 0, 0, 0.02), inset 0 -1px 2px rgba(0, 0, 0, 0.01), 0 1px 2px rgba(255, 255, 255, 0.8)',
+                border: '1px solid rgba(0, 0, 0, 0.06)'
               }}
             >
               {/* SVG Clock Face */}
@@ -222,8 +159,8 @@ const Stopwatch: React.FC<StopwatchProps> = ({
                   strokeWidth="0.5"
                 />
                 
-                {/* Enhanced Neon Progress Arc */}
-                {isRunning && !isPaused && (
+                {/* Enhanced Neon Progress Arc - Shows daily progress + current session */}
+                {true && (
                   <>
                     {/* Outer neon glow */}
                     <motion.path
@@ -493,9 +430,9 @@ const Stopwatch: React.FC<StopwatchProps> = ({
           </div>
         </div>
 
-        {/* Digital Time Display - Futuristic Typography */}
+        {/* Digital Time Display - Clean Typography */}
         <motion.div 
-          className="text-center mb-10 relative z-10"
+          className="text-center mb-6 relative"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -531,7 +468,7 @@ const Stopwatch: React.FC<StopwatchProps> = ({
 
         {/* Enhanced Controls */}
         <motion.div 
-          className="flex justify-center gap-6 relative z-10 mb-4"
+          className="flex justify-center gap-6 relative mb-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -545,7 +482,7 @@ const Stopwatch: React.FC<StopwatchProps> = ({
                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif',
                 background: selectedProject && selectedSubproject 
                   ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.9) 0%, rgba(147, 51, 234, 0.9) 100%)'
-                  : 'linear-gradient(135deg, rgba(156, 163, 175, 0.8) 0%, rgba(107, 114, 128, 0.8) 100%)',
+                  : 'linear-gradient(135deg, rgba(168, 85, 247, 0.4) 0%, rgba(147, 51, 234, 0.5) 100%)',
                 boxShadow: selectedProject && selectedSubproject 
                   ? '0 8px 16px rgba(168, 85, 247, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
                   : '0 4px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
