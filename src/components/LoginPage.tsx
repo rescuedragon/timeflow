@@ -264,14 +264,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             </button>
           </form>
 
-          {/* Demo Credentials Hint */}
-          <div className="demo-hint">
-            <p className="demo-text">Demo credentials:</p>
-            <div className="demo-credentials">
-              <span className="credential">Username: admin</span>
-              <span className="credential">Password: password</span>
-            </div>
-          </div>
+          
         </div>
       </div>
     </div>
