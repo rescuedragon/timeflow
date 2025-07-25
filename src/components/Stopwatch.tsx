@@ -88,7 +88,7 @@ const Stopwatch: React.FC<StopwatchProps> = ({
   };
 
   return (
-    <div className="w-1/2">
+    <div className="w-[612px]">
       {/* Premium Paper Background Container */}
       <div 
         className="p-8 rounded-[2.5rem] h-[612px] flex flex-col justify-center items-center relative"
