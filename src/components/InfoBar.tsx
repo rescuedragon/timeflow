@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
 import AnalogClock from './AnalogClock';
+import { IN, GB, US } from 'country-flag-icons/react/3x2';
 
 interface InfoBarProps {
   isTimerActive: boolean;
@@ -117,7 +118,7 @@ const InfoBar: React.FC<InfoBarProps> = ({
                     {getTimeZoneTime('Asia/Kolkata')}
                   </div>
                   <div className="w-6 h-6 flex items-center justify-center">
-                    <span role="img" aria-label="India" className="text-xl">🇮🇳</span>
+                    <IN className="w-6 h-4" title="India" />
                   </div>
                 </div>
 
@@ -128,7 +129,7 @@ const InfoBar: React.FC<InfoBarProps> = ({
                     {getTimeZoneTime('Europe/London')}
                   </div>
                   <div className="w-6 h-6 flex items-center justify-center">
-                    <span role="img" aria-label="UK" className="text-xl">🇬🇧</span>
+                    <GB className="w-6 h-4" title="United Kingdom" />
                   </div>
                 </div>
 
@@ -139,7 +140,7 @@ const InfoBar: React.FC<InfoBarProps> = ({
                     {getTimeZoneTime('America/New_York')}
                   </div>
                   <div className="w-6 h-6 flex items-center justify-center">
-                    <span role="img" aria-label="USA" className="text-xl">🇺🇸</span>
+                    <US className="w-6 h-4" title="United States" />
                   </div>
                 </div>
               </div>
