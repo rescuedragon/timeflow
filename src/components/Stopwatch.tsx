@@ -1,7 +1,7 @@
 import React from 'react';
 import { Play, Pause, Square } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { motion } from 'framer-motion';
 
 interface StopwatchProps {
   time: number;
@@ -26,6 +26,26 @@ const Stopwatch: React.FC<StopwatchProps> = ({
   onResume,
   onStop
 }) => {
+  const [smoothTime, setSmoothTime] = React.useState(0);
+
+  // Create smooth time progression independent of the main timer
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isRunning && !isPaused) {
+      interval = setInterval(() => {
+        setSmoothTime(prev => prev + 0.05); // Increment by 50ms
+      }, 50);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isRunning, isPaused]);
+
+  // Sync smooth time with actual time only when timer state changes
+  React.useEffect(() => {
+    setSmoothTime(time);
+  }, [time, isRunning, isPaused]);
+
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -33,107 +53,349 @@ const Stopwatch: React.FC<StopwatchProps> = ({
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Calculate angles for the hands using smooth time
+  const getSecondAngle = () => {
+    const useTime = isRunning && !isPaused ? smoothTime : time;
+    return ((useTime % 60) * 6) - 90; // 6 degrees per second
+  };
+  const getMinuteAngle = () => {
+    const useTime = isRunning && !isPaused ? smoothTime : time;
+    return (((useTime % 3600) / 60) * 6) - 90; // 6 degrees per minute
+  };
+  const getHourAngle = () => {
+    const useTime = isRunning && !isPaused ? smoothTime : time;
+    return ((useTime / 3600) * 30) - 90; // 30 degrees per hour
+  };
+
+  // Calculate progress arc for smooth elapsed time visualization
+  const getProgressPath = () => {
+    const useTime = isRunning && !isPaused ? smoothTime : time;
+    const totalSeconds = useTime % 60; // Progress through current minute
+    const progress = totalSeconds / 60;
+    const angle = progress * 360;
+    const radians = (angle * Math.PI) / 180;
+    const centerX = 180;
+    const centerY = 180;
+    const radius = 161; // Positioned to completely overlap minute markers
+    
+    const x = centerX + radius * Math.cos(radians - Math.PI / 2);
+    const y = centerY + radius * Math.sin(radians - Math.PI / 2);
+    
+    const largeArcFlag = angle > 180 ? 1 : 0;
+    
+    return `M ${centerX} ${centerY - radius} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x} ${y}`;
+  };
+
   return (
     <div className="w-1/2">
-      <Card className="p-8 bg-white/98 backdrop-blur-xl border border-white/30 shadow-xl rounded-3xl h-[612px] flex flex-col justify-center items-center relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/95 to-slate-50/90 z-0"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border-[15px] border-purple-100/20 z-0"></div>
+      <Card className="p-6 bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl h-[612px] flex flex-col justify-center items-center relative overflow-hidden">
+        {/* Premium Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/98 to-gray-50/95 z-0"></div>
         
-        {/* Timer Display */}
-        <div className="text-center mb-12 relative z-10">
-          <div className="text-sm uppercase tracking-widest text-slate-400 mb-4 font-medium">
-            {!isRunning ? "Ready to start" : isPaused ? "Timer paused" : "Timer running"}
-          </div>
-          
-          <div className="stopwatch-time-display relative">
-            <div className="text-7xl font-mono font-bold text-gray-800 tracking-tight">
-              {formatTime(time)}
+        {/* Braun-Style Stopwatch */}
+        <div className="relative z-10 mb-6">
+          {/* Main Stopwatch Body */}
+          <div 
+            className="relative w-96 h-96 rounded-3xl bg-white shadow-2xl"
+            style={{
+              background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+              boxShadow: '0 25px 50px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)'
+            }}
+          >
+            {/* Top Button (Start/Stop) */}
+            <div 
+              className="absolute -top-4 left-10 w-16 h-10 rounded-full bg-white shadow-lg"
+              style={{
+                background: 'linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%)',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8)'
+              }}
+            />
+            
+            {/* Speaker Grille */}
+            <div className="absolute top-6 right-8">
+              <div className="grid grid-cols-4 gap-1.5">
+                {Array.from({ length: 16 }).map((_, i) => (
+                  <div 
+                    key={i} 
+                    className="w-1.5 h-1.5 rounded-full bg-gray-800"
+                  />
+                ))}
+              </div>
             </div>
             
-            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full"></div>
-            <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-48 h-6 bg-purple-400/20 blur-xl rounded-full"></div>
-          </div>
-          
-          {isRunning && (
-            <div className="mt-8 flex items-center justify-center">
-              <div className={`w-2.5 h-2.5 rounded-full ${isPaused ? "bg-amber-500" : "bg-purple-600 animate-pulse"} mr-2`}></div>
-              <span className="text-sm text-slate-500 font-medium">
-                {isPaused ? "Paused" : "Running"}
-              </span>
+            {/* Clock Face */}
+            <div 
+              className="absolute inset-8 rounded-full bg-gray-100 shadow-inner"
+              style={{
+                background: 'linear-gradient(145deg, #f1f5f9 0%, #e2e8f0 100%)',
+                boxShadow: 'inset 0 4px 8px rgba(0,0,0,0.1)'
+              }}
+            >
+              {/* SVG Clock Face */}
+              <svg className="w-full h-full" viewBox="0 0 360 360">
+                {/* Outer Ring */}
+                <circle
+                  cx="180"
+                  cy="180"
+                  r="170"
+                  fill="none"
+                  stroke="#e2e8f0"
+                  strokeWidth="2"
+                />
+                
+                {/* Progress Arc - Light Purple with smooth edges that completely covers minute markers */}
+                {isRunning && !isPaused && (
+                  <path
+                    d={getProgressPath()}
+                    fill="none"
+                    stroke="#a855f7"
+                    strokeWidth="12"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{
+                      filter: 'blur(0.5px)',
+                      opacity: 0.9
+                    }}
+                  />
+                )}
+                {/* Overlay for extra smoothness */}
+                {isRunning && !isPaused && (
+                  <path
+                    d={getProgressPath()}
+                    fill="none"
+                    stroke="#c084fc"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{
+                      opacity: 0.7
+                    }}
+                  />
+                )}
+                
+                {/* Hour Markers - Symmetrical and integrated with purple ring */}
+                {Array.from({ length: 12 }).map((_, i) => {
+                  const angle = (i * 30) - 90;
+                  const isMainHour = i % 3 === 0;
+                  
+                  if (isMainHour) {
+                    // Main hour markers (12, 3, 6, 9) - extend through purple ring area symmetrically
+                    const outerRadius = 170;
+                    const innerRadius = 135;
+                    
+                    const x1 = 180 + outerRadius * Math.cos((angle * Math.PI) / 180);
+                    const y1 = 180 + outerRadius * Math.sin((angle * Math.PI) / 180);
+                    const x2 = 180 + innerRadius * Math.cos((angle * Math.PI) / 180);
+                    const y2 = 180 + innerRadius * Math.sin((angle * Math.PI) / 180);
+                    
+                    return (
+                      <line
+                        key={i}
+                        x1={x1}
+                        y1={y1}
+                        x2={x2}
+                        y2={y2}
+                        stroke="#1f2937"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                      />
+                    );
+                  } else {
+                    // Regular hour markers - contained within purple ring area
+                    const outerRadius = 167;
+                    const innerRadius = 150;
+                    
+                    const x1 = 180 + outerRadius * Math.cos((angle * Math.PI) / 180);
+                    const y1 = 180 + outerRadius * Math.sin((angle * Math.PI) / 180);
+                    const x2 = 180 + innerRadius * Math.cos((angle * Math.PI) / 180);
+                    const y2 = 180 + innerRadius * Math.sin((angle * Math.PI) / 180);
+                    
+                    return (
+                      <line
+                        key={i}
+                        x1={x1}
+                        y1={y1}
+                        x2={x2}
+                        y2={y2}
+                        stroke="#374151"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                      />
+                    );
+                  }
+                })}
+                
+                {/* Minute Markers - Completely enclosed within purple ring */}
+                {Array.from({ length: 60 }).map((_, i) => {
+                  if (i % 5 !== 0) {
+                    const angle = (i * 6) - 90;
+                    const outerRadius = 167; // Outer edge of purple ring area
+                    const innerRadius = 155; // Inner edge of purple ring area
+                    
+                    const x1 = 180 + outerRadius * Math.cos((angle * Math.PI) / 180);
+                    const y1 = 180 + outerRadius * Math.sin((angle * Math.PI) / 180);
+                    const x2 = 180 + innerRadius * Math.cos((angle * Math.PI) / 180);
+                    const y2 = 180 + innerRadius * Math.sin((angle * Math.PI) / 180);
+                    
+                    return (
+                      <line
+                        key={i}
+                        x1={x1}
+                        y1={y1}
+                        x2={x2}
+                        y2={y2}
+                        stroke="#6b7280"
+                        strokeWidth="1.5"
+                      />
+                    );
+                  }
+                  return null;
+                })}
+                
+
+                
+                {/* Date Display - Moved up to fill space */}
+                <text x="180" y="240" textAnchor="middle" className="fill-gray-700 text-lg font-medium" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+                  {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                </text>
+                
+                {/* Hour Hand - Thicker and more prominent */}
+                <motion.line
+                  x1="180"
+                  y1="180"
+                  x2={180 + 70 * Math.cos((getHourAngle() * Math.PI) / 180)}
+                  y2={180 + 70 * Math.sin((getHourAngle() * Math.PI) / 180)}
+                  stroke="#1f2937"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  animate={{
+                    x2: 180 + 70 * Math.cos((getHourAngle() * Math.PI) / 180),
+                    y2: 180 + 70 * Math.sin((getHourAngle() * Math.PI) / 180)
+                  }}
+                  transition={{ duration: 0.5 }}
+                />
+                
+                {/* Minute Hand - Longer and more prominent */}
+                <motion.line
+                  x1="180"
+                  y1="180"
+                  x2={180 + 110 * Math.cos((getMinuteAngle() * Math.PI) / 180)}
+                  y2={180 + 110 * Math.sin((getMinuteAngle() * Math.PI) / 180)}
+                  stroke="#1f2937"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                  animate={{
+                    x2: 180 + 110 * Math.cos((getMinuteAngle() * Math.PI) / 180),
+                    y2: 180 + 110 * Math.sin((getMinuteAngle() * Math.PI) / 180)
+                  }}
+                  transition={{ duration: 0.5 }}
+                />
+                
+                {/* Second Hand - Light Purple with smooth continuous movement */}
+                <motion.line
+                  x1="180"
+                  y1="180"
+                  x2={180 + 130 * Math.cos((getSecondAngle() * Math.PI) / 180)}
+                  y2={180 + 130 * Math.sin((getSecondAngle() * Math.PI) / 180)}
+                  stroke="#a855f7"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  animate={{
+                    x2: 180 + 130 * Math.cos((getSecondAngle() * Math.PI) / 180),
+                    y2: 180 + 130 * Math.sin((getSecondAngle() * Math.PI) / 180)
+                  }}
+                  transition={{ 
+                    duration: isRunning && !isPaused ? 0.05 : 0.5,
+                    ease: "linear"
+                  }}
+                />
+                
+                {/* Center Dot - Larger and more prominent with light purple */}
+                <circle cx="180" cy="180" r="12" fill="#a855f7" />
+                <circle cx="180" cy="180" r="6" fill="white" />
+              </svg>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Timer Controls */}
-        <div className="flex justify-center gap-5 relative z-10">
+        {/* Digital Time Display */}
+        <motion.div 
+          className="text-center mb-6 relative z-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="text-sm uppercase tracking-widest text-gray-500 mb-2 font-medium">
+            {!isRunning ? "READY TO START" : isPaused ? "TIMER PAUSED" : "TIMER RUNNING"}
+          </div>
+          <div 
+            className="text-4xl font-bold text-gray-900 tracking-tight"
+            style={{ fontFamily: 'Helvetica, Arial, monospace' }}
+          >
+            {formatTime(time)}
+          </div>
+        </motion.div>
+
+        {/* Controls */}
+        <motion.div 
+          className="flex justify-center gap-4 relative z-10 mb-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           {!isRunning ? (
-            <Button
+            <motion.button
               onClick={onStart}
-              size="lg"
-              className="h-14 px-12 text-lg rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold font-system flex items-center"
               disabled={!selectedProject || !selectedSubproject}
+              className="h-12 px-8 text-base rounded-2xl bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold flex items-center gap-3 transition-all duration-200 shadow-lg hover:shadow-xl"
+              style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
+              whileHover={{ scale: selectedProject && selectedSubproject ? 1.02 : 1 }}
+              whileTap={{ scale: selectedProject && selectedSubproject ? 0.98 : 1 }}
             >
-              <div className="bg-white/20 backdrop-blur-sm rounded-lg p-1.5 mr-3">
-                <Play className="w-5 h-5 text-white" />
-              </div>
-              Start
-            </Button>
+              <Play className="w-4 h-4" />
+              Start Timer
+            </motion.button>
           ) : (
             <>
               {!isPaused ? (
-                <Button
+                <motion.button
                   onClick={onPause}
-                  size="lg"
-                  className="h-14 px-10 text-lg rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold font-system flex items-center"
+                  className="h-12 px-6 text-base rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-semibold flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <div className="bg-white/20 backdrop-blur-sm rounded-lg p-1.5 mr-2">
-                    <Pause className="w-5 h-5 text-white" />
-                  </div>
+                  <Pause className="w-4 h-4" />
                   Pause
-                </Button>
+                </motion.button>
               ) : (
-                <Button
+                <motion.button
                   onClick={onResume}
-                  size="lg"
-                  className="h-14 px-10 text-lg rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold font-system flex items-center"
+                  className="h-12 px-6 text-base rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-semibold flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <div className="bg-white/20 backdrop-blur-sm rounded-lg p-1.5 mr-2">
-                    <Play className="w-5 h-5 text-white" />
-                  </div>
+                  <Play className="w-4 h-4" />
                   Resume
-                </Button>
+                </motion.button>
               )}
               
-              <Button
+              <motion.button
                 onClick={onStop}
-                variant="outline"
-                size="lg"
-                className="h-14 px-8 text-lg rounded-xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 font-semibold font-system transition-all duration-300 flex items-center"
+                className="h-12 px-6 text-base rounded-2xl bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 font-semibold flex items-center gap-2 transition-all duration-200 shadow-sm"
+                style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <div className="bg-slate-100/60 backdrop-blur-sm rounded-lg p-1.5 mr-2">
-                  <Square className="w-5 h-5 text-slate-600" />
-                </div>
+                <Square className="w-4 h-4" />
                 Stop
-              </Button>
+              </motion.button>
             </>
           )}
-        </div>
+        </motion.div>
 
-        {/* Selection Status */}
-        <div className="absolute bottom-6 left-0 right-0 text-center">
-          {selectedProject && selectedSubproject ? (
-            <div className="inline-flex items-center bg-slate-100/60 backdrop-blur-sm rounded-full px-4 py-2 border border-slate-200/40 shadow-sm">
-              <div className="text-slate-600 font-medium text-sm">
-                {selectedProject.name} → <span className="text-purple-600">{selectedSubproject}</span>
-              </div>
-            </div>
-          ) : (
-            <div className="text-slate-400 text-sm font-medium">
-              Select a project and task to start tracking
-            </div>
-          )}
-        </div>
+
       </Card>
     </div>
   );
