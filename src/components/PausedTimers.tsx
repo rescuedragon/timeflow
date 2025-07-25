@@ -78,10 +78,6 @@ const PausedTimers: React.FC<PausedTimersProps> = ({
             className="mb-6"
           >
             <div className="flex items-center gap-4">
-              <div className="relative">
-                <div className="w-3 h-3 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full animate-pulse"></div>
-                <div className="absolute inset-0 w-3 h-3 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full animate-ping opacity-75"></div>
-              </div>
               <h2 className="text-xl font-semibold text-gray-900 tracking-tight" style={{
                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif'
               }}>
