@@ -63,6 +63,11 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchIconAnimate, setSearchIconAnimate] = useState(false);
 
+  // QuickStart states
+  const [isQuickStartEditMode, setIsQuickStartEditMode] = useState(false);
+  const [selectedQuickStartCombinations, setSelectedQuickStartCombinations] = useState<QuickStartItem[]>([]);
+  const [tempQuickStartSelections, setTempQuickStartSelections] = useState<QuickStartItem[]>([]);
+
   // Refs
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -91,7 +96,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [selectedProject, selectedSubproject, onProjectSelect, onSubprojectSelect]);
+  }, [selectedProject, selectedSubproject, onProjectSelect, onSubprojectSelect, isTimerRunning]);
 
   // Handle click outside to remove focus
   useEffect(() => {
@@ -133,6 +138,46 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
         return bFreq - aFreq;
       })
     : [];
+
+  // QuickStart helper functions
+  const handleQuickStartEdit = () => {
+    setIsQuickStartEditMode(true);
+    setTempQuickStartSelections([...selectedQuickStartCombinations]);
+  };
+
+  const handleQuickStartSave = () => {
+    setSelectedQuickStartCombinations([...tempQuickStartSelections]);
+    setIsQuickStartEditMode(false);
+  };
+
+  const handleQuickStartCancel = () => {
+    setTempQuickStartSelections([...selectedQuickStartCombinations]);
+    setIsQuickStartEditMode(false);
+  };
+
+  const addQuickStartCombination = (project: Project, subproject: string) => {
+    if (tempQuickStartSelections.length >= 12) return;
+
+    const newCombination: QuickStartItem = {
+      id: `${project.id}-${subproject}`,
+      projectId: project.id,
+      projectName: project.name,
+      subproject: subproject,
+      category: project.category,
+      frequency: 0,
+      lastUsed: new Date().toISOString()
+    };
+
+    setTempQuickStartSelections(prev => [...prev, newCombination]);
+  };
+
+  const removeQuickStartCombination = (id: string) => {
+    setTempQuickStartSelections(prev => prev.filter(item => item.id !== id));
+  };
+
+  const handleQuickStartItemClick = (item: QuickStartItem) => {
+    onQuickStart(item);
+  };
 
   // Keyboard navigation handlers
   const handleProjectKeyDown = (e: React.KeyboardEvent) => {
@@ -233,18 +278,18 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
               WebkitTapHighlightColor: 'transparent',
               outline: 'none'
             }}
-                            onClick={() => {
-                  if (inputRef.current) {
-                    inputRef.current.focus();
-                  }
-                  // Deselect project and subproject when clicking inside search
-                  if (selectedProject || selectedSubproject) {
-                    onProjectSelect(null);
-                    onSubprojectSelect('');
-                    setProjectSearchQuery('');
-                    setSubprojectSearchQuery('');
-                  }
-                }}
+            onClick={() => {
+              if (inputRef.current) {
+                inputRef.current.focus();
+              }
+              // Deselect project and subproject when clicking inside search
+              if (selectedProject || selectedSubproject) {
+                onProjectSelect(null);
+                onSubprojectSelect('');
+                setProjectSearchQuery('');
+                setSubprojectSearchQuery('');
+              }
+            }}
           >
             <div className={`px-4 py-3 flex items-center w-full ${isDropdownOpen ? 'pt-8 pb-6' : ''}`}>
               <Search className={`w-5 h-5 text-gray-400 flex-shrink-0 ${searchIconAnimate ? 'search-icon-animate' : ''}`} />
@@ -447,10 +492,12 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                     from <span className="font-medium text-slate-700">{selectedProject?.name}</span>
                   </p>
                 </div>
-                <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-50 to-white border border-purple-200/40 rounded-full">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-2 animate-pulse"></div>
-                  <span className="text-sm font-medium text-purple-700">Ready to Start</span>
-                </div>
+                {!isTimerRunning && (
+                  <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-50 to-white border border-purple-200/40 rounded-full">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mr-2 animate-pulse"></div>
+                    <span className="text-sm font-medium text-purple-700">Ready to Start</span>
+                  </div>
+                )}
                 <div className="mt-8 flex items-center justify-center gap-6">
                   <button
                     onClick={() => {
@@ -526,21 +573,172 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
           </div>
         )}
 
-        {/* Empty QuickStart section */}
+        {/* QuickStart section */}
         {!selectedProject && activeTab === 'quick' && (
-          <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mb-6">
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center text-slate-400 py-20">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-100 to-purple-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                  </svg>
+          <div className="flex-1 bg-white/90 rounded-2xl shadow-sm overflow-hidden mb-6 relative">
+            {/* Edit button - positioned at bottom right */}
+            {!isQuickStartEditMode && (
+              <button
+                onClick={handleQuickStartEdit}
+                title="Edit QuickStart combinations"
+                style={{
+                  position: 'absolute',
+                  bottom: '16px',
+                  right: '16px',
+                  width: '48px',
+                  height: '48px',
+                  background: '#7e22ce',
+                  border: '2px solid #7e22ce',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  zIndex: 100000,
+                  boxShadow: '0 4px 12px rgba(126, 34, 206, 0.3)',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#9333ea';
+                  e.currentTarget.style.borderColor = '#9333ea';
+                  e.currentTarget.style.transform = 'scale(1.1)';
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(126, 34, 206, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#7e22ce';
+                  e.currentTarget.style.borderColor = '#7e22ce';
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(126, 34, 206, 0.3)';
+                }}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'white' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+            )}
+
+            {isQuickStartEditMode ? (
+              // Edit mode - show project and subproject selection
+              <div className="h-full overflow-y-auto p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-slate-800">Select QuickStart Combinations</h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleQuickStartCancel}
+                      className="px-3 py-1 text-sm text-slate-600 hover:text-slate-800 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleQuickStartSave}
+                      className="px-4 py-1 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      Save
+                    </button>
+                  </div>
                 </div>
-                <h3 className="text-lg font-medium mb-2 text-slate-600">QuickStart</h3>
-                <p className="text-sm text-slate-500">This section is currently empty</p>
+
+                <div className="mb-4">
+                  <p className="text-sm text-slate-600 mb-2">
+                    Selected: {tempQuickStartSelections.length}/12
+                  </p>
+                  {tempQuickStartSelections.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {tempQuickStartSelections.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm"
+                        >
+                          <span>{item.projectName} - {item.subproject}</span>
+                          <button
+                            onClick={() => removeQuickStartCombination(item.id)}
+                            className="text-purple-500 hover:text-purple-700"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  {projects.map((project) => (
+                    <div key={project.id} className="border border-gray-200 rounded-lg p-4">
+                      <h4 className="font-medium text-slate-800 mb-2">{project.name}</h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        {project.subprojects.map((subproject) => {
+                          const isSelected = tempQuickStartSelections.some(
+                            item => item.projectId === project.id && item.subproject === subproject
+                          );
+                          return (
+                            <button
+                              key={subproject}
+                              onClick={() => {
+                                if (isSelected) {
+                                  removeQuickStartCombination(`${project.id}-${subproject}`);
+                                } else {
+                                  addQuickStartCombination(project, subproject);
+                                }
+                              }}
+                              disabled={!isSelected && tempQuickStartSelections.length >= 12}
+                              className={`p-2 text-sm rounded-lg border transition-all ${isSelected
+                                ? 'bg-purple-600 text-white border-purple-600'
+                                : 'bg-white text-slate-700 border-gray-300 hover:border-purple-300 hover:bg-purple-50'
+                                } ${!isSelected && tempQuickStartSelections.length >= 12 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                              {subproject}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              // Display mode - show QuickStart buttons
+              <div className="h-full overflow-y-auto pb-16">
+                {selectedQuickStartCombinations.length > 0 ? (
+                  <div className="quickstart-grid">
+                    {selectedQuickStartCombinations.map((item) => (
+                      <div
+                        key={item.id}
+                        className="quickstart-grid-item group relative"
+                      >
+                        <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 square-card">
+                          <button
+                            className="quickstart-button w-full h-full"
+                            onClick={() => handleQuickStartItemClick(item)}
+                          >
+                            {/* Project Name */}
+                            <div className="project-name">
+                              {item.projectName}
+                            </div>
+                            {/* Subproject Name */}
+                            <div className="subproject-name">
+                              {item.subproject}
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-slate-400 py-20">
+                    <div className="w-12 h-12 bg-gradient-to-r from-purple-100 to-purple-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-medium mb-2 text-slate-600">QuickStart</h3>
+                    <p className="text-sm text-slate-500">No QuickStart combinations set</p>
+                  </div>
+                )}
+              </div>
+            )}
+
           </div>
         )}
 

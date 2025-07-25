@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import InfoBar from './InfoBar';
 import ProjectSelector from './ProjectSelector';
 import Stopwatch from './Stopwatch';
+import TimeLogModal from './TimeLogModal';
 
 interface Project {
   id: string;
@@ -21,6 +22,14 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedSubproject, setSelectedSubproject] = useState<string>('');
   const [startTime, setStartTime] = useState<Date | null>(null);
+  const [showTimeLogModal, setShowTimeLogModal] = useState(false);
+  const [pendingTimeLog, setPendingTimeLog] = useState<{
+    project: Project;
+    subproject: string;
+    startTime: Date;
+    endTime: Date;
+    totalSeconds: number;
+  } | null>(null);
 
   // Frequency tracking (simulate with static data for now)
   const [projectFrequency] = useState<Record<string, number>>({
@@ -227,38 +236,63 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
   };
 
   const handleStop = () => {
-    if (!startTime) return;
+    if (!startTime || !selectedProject) return;
     
     const endTime = new Date();
-    const entry = {
-      id: Date.now().toString(),
-      date: startTime.toDateString(),
-      startTime: startTime.toTimeString().slice(0, 8),
-      endTime: endTime.toTimeString().slice(0, 8),
-      totalTime: formatTime(time),
-      project: selectedProject?.name,
-      subproject: selectedSubproject,
-      description: ''
-    };
-
-    onTimeLogged(entry);
     
-    // Reset timer and deselect project and subproject
+    // Store the time log data for the modal
+    setPendingTimeLog({
+      project: selectedProject,
+      subproject: selectedSubproject,
+      startTime: startTime,
+      endTime: endTime,
+      totalSeconds: time
+    });
+    
+    // Show the time log modal
+    setShowTimeLogModal(true);
+    
+    // Reset timer state but keep project/subproject selected until modal is saved/cancelled
     setIsRunning(false);
     setIsPaused(false);
     setTime(0);
     setStartTime(null);
-    setSelectedProject(null);
-    setSelectedSubproject('');
     
     // Log state for debugging
-    console.log('Timer stopped, new state:', { 
-      isRunning: false, 
-      isPaused: false, 
-      time: 0,
-      selectedProject: null,
-      selectedSubproject: ''
-    });
+    console.log('Timer stopped, showing time log modal');
+  };
+
+  const handleTimeLogSave = (logData: any) => {
+    // Create the entry in the expected format
+    const entry = {
+      id: Date.now().toString(),
+      date: logData.date,
+      startTime: logData.startTime,
+      endTime: logData.endTime,
+      totalTime: `${Math.floor(logData.totalHours)}:${Math.floor((logData.totalHours % 1) * 60).toString().padStart(2, '0')}:00`,
+      project: logData.project,
+      subproject: logData.subproject,
+      description: logData.description
+    };
+
+    onTimeLogged(entry);
+    
+    // Reset everything after saving
+    setSelectedProject(null);
+    setSelectedSubproject('');
+    setPendingTimeLog(null);
+    
+    console.log('Time log saved:', entry);
+  };
+
+  const handleTimeLogCancel = () => {
+    // Reset everything if user cancels
+    setSelectedProject(null);
+    setSelectedSubproject('');
+    setPendingTimeLog(null);
+    setShowTimeLogModal(false);
+    
+    console.log('Time log cancelled');
   };
 
   return (
@@ -287,6 +321,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
               quickStartCombinations={quickStartCombinations}
               projectFrequency={projectFrequency}
               subprojectFrequency={subprojectFrequency}
+              isTimerRunning={isRunning}
             />
 
             {/* Stopwatch Component */}
@@ -304,6 +339,20 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged }) => {
           </div>
         </div>
       </div>
+
+      {/* Time Log Modal */}
+      {showTimeLogModal && pendingTimeLog && (
+        <TimeLogModal
+          isOpen={showTimeLogModal}
+          onClose={handleTimeLogCancel}
+          onSave={handleTimeLogSave}
+          projectName={pendingTimeLog.project.name}
+          subprojectName={pendingTimeLog.subproject}
+          startTime={pendingTimeLog.startTime}
+          endTime={pendingTimeLog.endTime}
+          totalSeconds={pendingTimeLog.totalSeconds}
+        />
+      )}
     </div>
   );
 };

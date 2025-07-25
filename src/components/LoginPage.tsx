@@ -104,15 +104,30 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     setIsLoading(true);
     setError('');
 
-    // Simulate loading delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 800));
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (username === 'admin' && password === 'password') {
-      // Mark as logged in
-      localStorage.setItem('timeflo_has_logged_in', 'true');
-      onLoginSuccess();
-    } else {
-      setError('Invalid username or password');
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Store token and user data
+        localStorage.setItem('timeflo_token', data.token);
+        localStorage.setItem('timeflo_user', JSON.stringify(data.user));
+        localStorage.setItem('timeflo_has_logged_in', 'true');
+        onLoginSuccess();
+      } else {
+        setError(data.error || 'Login failed');
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Network error. Please check if the server is running.');
       setIsLoading(false);
     }
   };
