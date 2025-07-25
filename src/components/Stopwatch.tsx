@@ -449,7 +449,6 @@ const Stopwatch: React.FC<StopwatchProps> = ({
               backgroundClip: 'text'
             }}
             animate={{
-              scale: isRunning && !isPaused ? [1, 1.015, 1] : 1,
               textShadow: isRunning && !isPaused ? [
                 '0 4px 8px rgba(0, 0, 0, 0.1), 0 0 20px rgba(168, 85, 247, 0.1)',
                 '0 4px 8px rgba(0, 0, 0, 0.1), 0 0 25px rgba(168, 85, 247, 0.2)',
