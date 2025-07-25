@@ -768,10 +768,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                       setSubprojectSearchQuery(subproject);
                     }}
                   >
-                    <div className="text-base font-medium text-slate-800 mb-1">{subproject}</div>
-                    <div className="text-sm text-slate-500">
-                      Click to select this task
-                    </div>
+                    <div className="text-base font-medium text-slate-800">{subproject}</div>
                   </button>
                 ))}
                 {filteredSubprojects.length === 0 && (
