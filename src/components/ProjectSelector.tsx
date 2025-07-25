@@ -782,11 +782,11 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                   Back to Projects
                 </button>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 subproject-list-container">
                 {filteredSubprojects.map((subproject, index) => (
                   <button
                     key={index}
-                    className="w-full p-4 text-left bg-white rounded-xl shadow-sm hover:shadow-md hover:bg-purple-50 transition-all duration-200 border border-gray-100 hover:border-purple-200"
+                    className="w-full p-4 text-left bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 transition-all duration-200 border border-gray-200 subproject-item"
                     onClick={() => {
                       if (isTimerRunning) {
                         return; // Don't allow subproject selection when timer is running

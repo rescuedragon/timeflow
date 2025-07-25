@@ -114,10 +114,10 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ onTimeLogged, dailyTimeEntrie
 
     const getSubprojectsForCategory = (category: 'Development' | 'Design' | 'Research') => {
       switch (category) {
-        case 'Development': return developmentSubprojects;
-        case 'Design': return designSubprojects;
-        case 'Research': return researchSubprojects;
-        default: return developmentSubprojects;
+        case 'Development': return developmentSubprojects.slice(0, 10);
+        case 'Design': return designSubprojects.slice(0, 10);
+        case 'Research': return researchSubprojects.slice(0, 10);
+        default: return developmentSubprojects.slice(0, 10);
       }
     };
 

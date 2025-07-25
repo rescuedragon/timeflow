@@ -102,8 +102,8 @@ const InfoBar: React.FC<InfoBarProps> = ({
                     style={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}>
                     HOURS
                   </div>
-                  <div className="text-white font-bold text-3xl leading-tight hours-value"
-                    style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  <div className="text-white font-light text-3xl leading-tight hours-value"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}>
                     {getDecimalHours(time)}
                   </div>
                 </div>
@@ -113,8 +113,8 @@ const InfoBar: React.FC<InfoBarProps> = ({
               <div className="flex-[0.2] flex flex-col justify-evenly py-4 px-6 border-l border-white/20">
                 {/* First time zone (India) */}
                 <div className="flex items-center justify-end animate-fade-in animate-fade-in-1">
-                  <div className="text-white font-medium text-2xl mr-3"
-                    style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  <div className="text-white font-light text-2xl mr-3"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}>
                     {getTimeZoneTime('Asia/Kolkata')}
                   </div>
                   <div className="w-6 h-6 flex items-center justify-center">
@@ -124,8 +124,8 @@ const InfoBar: React.FC<InfoBarProps> = ({
 
                 {/* Second time zone (UK) */}
                 <div className="flex items-center justify-end animate-fade-in animate-fade-in-2">
-                  <div className="text-white font-medium text-2xl mr-3"
-                    style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  <div className="text-white font-light text-2xl mr-3"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}>
                     {getTimeZoneTime('Europe/London')}
                   </div>
                   <div className="w-6 h-6 flex items-center justify-center">
@@ -135,8 +135,8 @@ const InfoBar: React.FC<InfoBarProps> = ({
 
                 {/* Third time zone (USA) */}
                 <div className="flex items-center justify-end animate-fade-in animate-fade-in-3">
-                  <div className="text-white font-medium text-2xl mr-3"
-                    style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  <div className="text-white font-light text-2xl mr-3"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}>
                     {getTimeZoneTime('America/New_York')}
                   </div>
                   <div className="w-6 h-6 flex items-center justify-center">
