@@ -185,7 +185,7 @@ const MyTasks: React.FC = () => {
               </h2>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-4">
               {activeTasks.map((task) => {
                 const deadline = formatDateTime(task.deadline);
                 const timeLeft = getTimeUntilDeadline(task.deadline);
@@ -193,79 +193,84 @@ const MyTasks: React.FC = () => {
 
                 return (
                   <Card key={task.id} className={`task-card p-6 bg-gradient-to-br from-white to-slate-50/50 backdrop-blur-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 ${overdue ? 'ring-2 ring-red-200 bg-gradient-to-br from-red-50/30 to-white' : ''}`}>
-                    <div className="space-y-4">
-                      {/* Header */}
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="font-bold text-slate-800 text-lg leading-tight mb-2">{task.title}</h3>
-                          <div className="flex items-center gap-2 text-sm text-slate-600 mb-1">
-                            <FolderOpen className="w-4 h-4" />
-                            <span className="font-medium">{task.project}</span>
-                            {task.subproject && (
-                              <>
-                                <span className="text-slate-400">•</span>
-                                <span>{task.subproject}</span>
-                              </>
-                            )}
+                    <div className="flex items-start gap-6">
+                      {/* Left Section - Task Info */}
+                      <div className="flex-1 space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-bold text-slate-800 text-xl leading-tight mb-2">{task.title}</h3>
+                            <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
+                              <FolderOpen className="w-4 h-4" />
+                              <span className="font-medium text-slate-700">{task.project}</span>
+                              {task.subproject && (
+                                <>
+                                  <span className="text-slate-400">•</span>
+                                  <span className="text-slate-600">{task.subproject}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <Badge className={`${getPriorityColor(task.priority)} border-2 shadow-sm ml-4`}>
+                            {getPriorityIcon(task.priority)}
+                            <span className="ml-1 capitalize font-medium">{task.priority}</span>
+                          </Badge>
+                        </div>
+
+                        {/* Description */}
+                        {task.description && (
+                          <p className="text-slate-600 text-sm leading-relaxed">{task.description}</p>
+                        )}
+
+                        {/* Delegation Info */}
+                        <div className="flex items-center gap-6 text-sm text-slate-500">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4" />
+                            <span>Delegated by <span className="font-medium text-slate-700">{task.delegatedBy}</span></span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            <span>On {formatDateTime(task.delegatedOn).date} at {formatDateTime(task.delegatedOn).time}</span>
                           </div>
                         </div>
-                        <Badge className={`${getPriorityColor(task.priority)} border-2 shadow-sm`}>
-                          {getPriorityIcon(task.priority)}
-                          <span className="ml-1 capitalize font-medium">{task.priority}</span>
-                        </Badge>
                       </div>
 
-                      {/* Description */}
-                      {task.description && (
-                        <p className="text-slate-600 text-sm leading-relaxed">{task.description}</p>
-                      )}
-
-                      {/* Delegation Info */}
-                      <div className="space-y-2 text-xs text-slate-500">
-                        <div className="flex items-center gap-2">
-                          <User className="w-3 h-3" />
-                          <span>Delegated by <span className="font-medium text-slate-700">{task.delegatedBy}</span></span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-3 h-3" />
-                          <span>On {formatDateTime(task.delegatedOn).date} at {formatDateTime(task.delegatedOn).time}</span>
-                        </div>
-                      </div>
-
-                      {/* Deadline */}
-                      <div className={`flex items-center justify-between p-3 rounded-xl ${overdue ? 'bg-red-50 border border-red-200' : 'bg-slate-50 border border-slate-200'}`}>
-                        <div className="text-sm">
-                          <div className={`font-medium ${overdue ? 'text-red-700' : 'text-slate-700'}`}>
-                            {deadline.date} at {deadline.time}
+                      {/* Right Section - Deadline & Actions */}
+                      <div className="flex flex-col items-end gap-4 min-w-0">
+                        {/* Deadline */}
+                        <div className={`flex items-center justify-between p-3 rounded-xl min-w-48 ${overdue ? 'bg-red-50 border border-red-200' : 'bg-slate-50 border border-slate-200'}`}>
+                          <div className="text-sm">
+                            <div className={`font-medium ${overdue ? 'text-red-700' : 'text-slate-700'}`}>
+                              {deadline.date} at {deadline.time}
+                            </div>
+                            <div className={`text-xs ${overdue ? 'text-red-600' : 'text-slate-500'}`}>
+                              Deadline
+                            </div>
                           </div>
-                          <div className={`text-xs ${overdue ? 'text-red-600' : 'text-slate-500'}`}>
-                            Deadline
-                          </div>
+                          <Badge variant={overdue ? 'destructive' : 'secondary'} className="text-xs font-medium ml-2">
+                            {timeLeft}
+                          </Badge>
                         </div>
-                        <Badge variant={overdue ? 'destructive' : 'secondary'} className="text-xs font-medium">
-                          {timeLeft}
-                        </Badge>
-                      </div>
 
-                      {/* Action Buttons */}
-                      <div className="flex gap-2 pt-2">
-                        <Button
-                          onClick={() => markAsComplete(task.id)}
-                          size="sm"
-                          className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-md hover:shadow-lg transition-all duration-300 font-medium rounded-xl"
-                        >
-                          <CheckSquare className="w-4 h-4 mr-1" />
-                          Complete
-                        </Button>
-                        <Button
-                          onClick={() => startTimer(task.project, task.subproject)}
-                          size="sm"
-                          variant="outline"
-                          className="flex-1 bg-white/80 hover:bg-white border-2 shadow-md hover:shadow-lg transition-all duration-300 font-medium rounded-xl"
-                        >
-                          <Play className="w-4 h-4 mr-1" />
-                          Start Timer
-                        </Button>
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => markAsComplete(task.id)}
+                            size="sm"
+                            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-md hover:shadow-lg transition-all duration-300 font-medium rounded-xl text-white"
+                          >
+                            <CheckSquare className="w-4 h-4 mr-1" />
+                            Complete
+                          </Button>
+                          <Button
+                            onClick={() => startTimer(task.project, task.subproject)}
+                            size="sm"
+                            variant="outline"
+                            className="bg-white/80 hover:bg-white border-2 shadow-md hover:shadow-lg transition-all duration-300 font-medium rounded-xl text-slate-700"
+                          >
+                            <Play className="w-4 h-4 mr-1" />
+                            Start Timer
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </Card>
@@ -380,97 +385,103 @@ const MyTasks: React.FC = () => {
         {/* Delegate Task Modal */}
         {showDelegateModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-md bg-white rounded-3xl shadow-2xl border-0 overflow-hidden">
+            <Card className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border-0 overflow-hidden">
               <div className="p-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold text-slate-800">Delegate Task</h3>
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="text-3xl font-bold text-slate-800">Delegate Task</h3>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowDelegateModal(false)}
-                    className="rounded-full p-2"
+                    className="rounded-full p-2 text-slate-600 hover:text-slate-800 text-2xl font-bold"
                   >
                     ×
                   </Button>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Assignee</label>
-                    <select className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                      <option>Select team member...</option>
-                      <option>John Smith</option>
-                      <option>Sarah Johnson</option>
-                      <option>Mike Chen</option>
-                    </select>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Left Column */}
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-base font-semibold text-slate-800 mb-3">Assignee</label>
+                      <select className="w-full p-4 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white text-base">
+                        <option className="text-slate-500">Select team member...</option>
+                        <option className="text-slate-700">John Smith</option>
+                        <option className="text-slate-700">Sarah Johnson</option>
+                        <option className="text-slate-700">Mike Chen</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-base font-semibold text-slate-800 mb-3">Project</label>
+                      <select className="w-full p-4 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white text-base">
+                        <option className="text-slate-500">Select project...</option>
+                        <option className="text-slate-700">Design System</option>
+                        <option className="text-slate-700">Frontend Development</option>
+                        <option className="text-slate-700">Backend Development</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-base font-semibold text-slate-800 mb-3">Subproject</label>
+                      <input 
+                        type="text" 
+                        placeholder="Enter subproject..."
+                        className="w-full p-4 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 placeholder-slate-400 text-base"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-base font-semibold text-slate-800 mb-3">Priority</label>
+                      <select className="w-full p-4 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white text-base">
+                        <option value="low" className="text-slate-700">Low Priority</option>
+                        <option value="medium" className="text-slate-700">Medium Priority</option>
+                        <option value="high" className="text-slate-700">High Priority</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Project</label>
-                    <select className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                      <option>Select project...</option>
-                      <option>Design System</option>
-                      <option>Frontend Development</option>
-                      <option>Backend Development</option>
-                    </select>
-                  </div>
+                  {/* Right Column */}
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-base font-semibold text-slate-800 mb-3">Task Title</label>
+                      <input 
+                        type="text" 
+                        placeholder="Enter task title..."
+                        className="w-full p-4 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 placeholder-slate-400 text-base"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Subproject</label>
-                    <input 
-                      type="text" 
-                      placeholder="Enter subproject..."
-                      className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
+                    <div>
+                      <label className="block text-base font-semibold text-slate-800 mb-3">Description (Optional)</label>
+                      <textarea 
+                        placeholder="Enter task description..."
+                        rows={4}
+                        className="w-full p-4 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-slate-700 placeholder-slate-400 text-base"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Task Title</label>
-                    <input 
-                      type="text" 
-                      placeholder="Enter task title..."
-                      className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Description (Optional)</label>
-                    <textarea 
-                      placeholder="Enter task description..."
-                      rows={3}
-                      className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Deadline</label>
-                    <input 
-                      type="datetime-local" 
-                      className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Priority</label>
-                    <select className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
-                    </select>
+                    <div>
+                      <label className="block text-base font-semibold text-slate-800 mb-3">Deadline</label>
+                      <input 
+                        type="datetime-local" 
+                        className="w-full p-4 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 text-base"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex gap-3 mt-8">
+                <div className="flex justify-end gap-4 mt-10 pt-6 border-t border-slate-200">
                   <Button
                     variant="outline"
                     onClick={() => setShowDelegateModal(false)}
-                    className="flex-1 rounded-xl border-2"
+                    className="px-8 py-3 rounded-xl border-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-base"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={() => setShowDelegateModal(false)}
-                    className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl"
+                    className="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     Delegate Task
                   </Button>
