@@ -851,26 +851,64 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
               {/* Pinned Subprojects Section */}
               {pinnedSubprojects.filter(item => item && item.id).length > 0 && (
-                <div className="mb-4 pb-4 border-b border-gray-200">
-                  <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">Pinned</h4>
+                <div className="mb-6 bg-gradient-to-r from-purple-50/80 to-indigo-50/60 rounded-xl border border-purple-200/40 shadow-sm">
+                  <div className="flex items-center gap-2 p-4 pb-2">
+                    <Pin className="w-4 h-4 text-purple-600 fill-current" />
+                    <h4 className="text-sm font-bold text-purple-800 uppercase tracking-wide">Pinned</h4>
+                  </div>
                   <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext items={pinnedSubprojects.filter(item => item).map(item => item.id)} strategy={verticalListSortingStrategy}>
-                      <div className="space-y-2 subproject-list-container">
+                      <div className="space-y-3 subproject-list-container px-4 pb-4">
                         {pinnedSubprojects.filter(item => item).map((item) => (
                           <SortableItem key={item.id} id={item.id}>
-                            <button
-                              className="w-full p-4 text-left bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 transition-all duration-200 border border-gray-200 subproject-item"
-                              onClick={() => {
-                                if (isTimerRunning) {
-                                  return; // Don't allow subproject selection when timer is running
-                                }
-                                onProjectSelect(projects.find(p => p.id === item.projectId) || null);
-                                onSubprojectSelect(item.name);
-                                setSubprojectSearchQuery(item.name);
-                              }}
-                            >
-                              <div className="flex items-center justify-between w-full">
-                                <div className="text-base font-medium text-slate-800">{item.name}</div>
+                            <div className="w-full bg-white/90 backdrop-blur-sm rounded-xl shadow-md hover:shadow-lg hover:bg-white transition-all duration-300 border border-purple-200/50 group flex pinned-subproject-button" style={{ borderBottom: 'none !important', position: 'relative' }}>
+                              {/* Main clickable area - 90% width */}
+                              <button
+                                className="flex-1 p-4 text-left"
+                                style={{ 
+                                  border: 'none', 
+                                  borderBottom: 'none !important',
+                                  position: 'relative'
+                                }}
+                                onMouseEnter={(e) => {
+                                  const target = e.currentTarget;
+                                  target.style.setProperty('border-bottom', 'none', 'important');
+                                  target.style.setProperty('box-shadow', 'none', 'important');
+                                }}
+                                onMouseLeave={(e) => {
+                                  const target = e.currentTarget;
+                                  target.style.setProperty('border-bottom', 'none', 'important');
+                                }}
+                                onMouseDown={(e) => {
+                                  if (isTimerRunning) {
+                                    return; // Don't allow subproject selection when timer is running
+                                  }
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  onProjectSelect(projects.find(p => p.id === item.projectId) || null);
+                                  onSubprojectSelect(item.name);
+                                  setSubprojectSearchQuery(item.name);
+                                }}
+                                onTouchStart={(e) => {
+                                  if (isTimerRunning) {
+                                    return; // Don't allow subproject selection when timer is running
+                                  }
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  onProjectSelect(projects.find(p => p.id === item.projectId) || null);
+                                  onSubprojectSelect(item.name);
+                                  setSubprojectSearchQuery(item.name);
+                                }}
+                                style={{ pointerEvents: 'auto' }}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                  <div className="text-base font-medium text-slate-800 group-hover:text-purple-800 transition-colors">{item.name}</div>
+                                </div>
+                              </button>
+                              
+                              {/* Right side with pin button and drag handle */}
+                              <div className="flex items-center pr-3">
                                 <button
                                   onMouseDown={(e) => {
                                     e.stopPropagation();
@@ -882,14 +920,27 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                                     e.preventDefault();
                                     handlePinToggle(item.name, item.projectId, item.projectName);
                                   }}
-                                  className="ml-2 text-purple-600 hover:text-purple-800 transition-colors"
+                                  className="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-100 rounded-lg transition-all duration-200"
                                   title="Unpin this item"
                                   style={{ pointerEvents: 'auto' }}
                                 >
-                                  <Pin className="w-4 h-4 fill-current" />
+                                  <Pin className="w-5 h-5 fill-current" />
                                 </button>
+                                
+                                {/* Drag handle area */}
+                                <div 
+                                  className="w-6 h-full flex items-center justify-center cursor-move opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-1"
+                                  title="Drag to reorder"
+                                >
+                                  <div className="flex flex-col gap-0.5">
+                                    <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                                    <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                                    <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                                    <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                                  </div>
+                                </div>
                               </div>
-                            </button>
+                            </div>
                           </SortableItem>
                         ))}
                       </div>
@@ -898,13 +949,14 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                 </div>
               )}
 
-              <div className="space-y-2 subproject-list-container">
+              <div className="space-y-3 subproject-list-container">
                 {filteredSubprojects.map((subproject, index) => {
                   const isPinned = pinnedSubprojects.some(item => item && item.name === subproject && item.projectId === selectedProject?.id);
                   return (
                     <button
                       key={index}
-                      className="w-full p-4 text-left bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 transition-all duration-200 border border-gray-200 subproject-item"
+                      className="w-full p-4 text-left bg-white rounded-xl shadow-md hover:shadow-lg hover:bg-gray-50 transition-all duration-300 border border-gray-200/60 subproject-item group"
+                      style={{ borderBottom: 'none' }}
                       onClick={() => {
                         if (isTimerRunning) {
                           return; // Don't allow subproject selection when timer is running
@@ -914,7 +966,10 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                       }}
                     >
                       <div className="flex items-center justify-between w-full">
-                        <div className="text-base font-medium text-slate-800">{subproject}</div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 bg-gray-400 rounded-full group-hover:bg-purple-400 transition-colors"></div>
+                          <div className="text-base font-medium text-slate-800 group-hover:text-purple-800 transition-colors">{subproject}</div>
+                        </div>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -922,10 +977,10 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                               handlePinToggle(subproject, selectedProject.id, selectedProject.name);
                             }
                           }}
-                          className={`ml-2 transition-colors ${isPinned ? 'text-purple-600 hover:text-purple-800' : 'text-gray-400 hover:text-purple-600'}`}
+                          className={`ml-3 p-2 rounded-lg transition-all duration-200 ${isPinned ? 'text-purple-600 hover:text-purple-800 hover:bg-purple-100' : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'}`}
                           title={isPinned ? 'Unpin this item' : 'Pin this item'}
                         >
-                          <Pin className={`w-4 h-4 ${isPinned ? 'fill-current' : ''}`} />
+                          <Pin className={`w-5 h-5 ${isPinned ? 'fill-current' : ''}`} />
                         </button>
                       </div>
                     </button>

@@ -658,3 +658,35 @@ button.bg-white.rounded-xl.shadow-sm:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   transform: scale(1.02);
 }
+
+/* Override for pinned subproject buttons to remove any bottom lines */
+.pinned-subproject-button,
+.pinned-subproject-button:hover,
+.pinned-subproject-button:focus,
+.pinned-subproject-button:active {
+  border-bottom: none !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+}
+
+.pinned-subproject-button::before,
+.pinned-subproject-button::after {
+  display: none !important;
+}
+
+.pinned-subproject-button button,
+.pinned-subproject-button button:hover,
+.pinned-subproject-button button:focus,
+.pinned-subproject-button button:active {
+  border-bottom: none !important;
+  position: relative !important;
+}
+
+.pinned-subproject-button button::before,
+.pinned-subproject-button button::after {
+  display: none !important;
+}
+
+/* Ensure no tab-indicator styles apply to pinned buttons */
+.pinned-subproject-button .tab-indicator {
+  display: none !important;
+}
