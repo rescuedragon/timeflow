@@ -29,19 +29,21 @@ const Index: React.FC<IndexProps> = ({ onLogout }) => {
     setTimeEntries(prev => [...prev, entry]);
   };
 
+  // Keep TimeTracker always mounted to preserve timer state
   const renderActiveTab = () => {
-    switch (activeTab) {
-      case 'time-tracker':
-        return <TimeTracker onTimeLogged={handleTimeLogged} dailyTimeEntries={timeEntries} />;
-      case 'timesheet':
-        return <Timesheet timeEntries={timeEntries} />;
-      case 'my-tasks':
-        return <MyTasks />;
-      case 'holidays':
-        return <Holidays />;
-      default:
-        return <TimeTracker onTimeLogged={handleTimeLogged} dailyTimeEntries={timeEntries} />;
-    }
+    return (
+      <>
+        {/* TimeTracker is always mounted but hidden when not active */}
+        <div style={{ display: activeTab === 'time-tracker' ? 'block' : 'none' }}>
+          <TimeTracker onTimeLogged={handleTimeLogged} dailyTimeEntries={timeEntries} />
+        </div>
+        
+        {/* Other tabs are conditionally rendered */}
+        {activeTab === 'timesheet' && <Timesheet timeEntries={timeEntries} />}
+        {activeTab === 'my-tasks' && <MyTasks />}
+        {activeTab === 'holidays' && <Holidays />}
+      </>
+    );
   };
 
   return (
