@@ -35,6 +35,33 @@ const PausedTimers: React.FC<PausedTimersProps> = ({
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const formatHumanReadableTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    const parts = [];
+    
+    if (hours > 0) {
+      parts.push(`${hours} hour${hours !== 1 ? 's' : ''}`);
+    }
+    
+    if (minutes > 0) {
+      parts.push(`${minutes} minute${minutes !== 1 ? 's' : ''}`);
+    }
+    
+    if (secs > 0) {
+      parts.push(`${secs} second${secs !== 1 ? 's' : ''}`);
+    }
+    
+    // If no time has passed, show 0 seconds
+    if (parts.length === 0) {
+      return '0 seconds';
+    }
+    
+    return parts.join(' ');
+  };
+
   const formatHours = (seconds: number) => {
     const hours = seconds / 3600;
     return hours.toFixed(2);
@@ -120,9 +147,9 @@ const PausedTimers: React.FC<PausedTimersProps> = ({
 
                   <div className="relative p-4">
                     {/* Header Row */}
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
                           <div className="relative">
                             <div className="w-3 h-3 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full animate-pulse"></div>
                             <div className="absolute inset-0 w-3 h-3 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full animate-ping opacity-75"></div>
@@ -133,20 +160,45 @@ const PausedTimers: React.FC<PausedTimersProps> = ({
                             {timer.project?.name || 'Unknown Project'}
                           </h3>
                         </div>
-                        <p className="text-gray-600 font-medium text-sm ml-5">
+                        
+                        {/* Discard Button */}
+                        <motion.button
+                          onClick={() => onDiscard(timer.id)}
+                          className="h-8 px-3 rounded-lg font-medium flex items-center justify-center gap-1.5 transition-all duration-300 text-xs"
+                          style={{
+                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif',
+                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
+                            border: '1px solid rgba(0, 0, 0, 0.08)',
+                            color: '#6b7280',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
+                          }}
+                          whileHover={{ 
+                            scale: 1.02,
+                            boxShadow: '0 6px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
+                          }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          Discard
+                        </motion.button>
+                      </div>
+                      <div className="flex items-center gap-4 ml-5">
+                        <p className="text-gray-600 font-medium text-sm">
                           {timer.subproject}
                         </p>
-                      </div>
-                      
-                      {/* Time Display */}
-                      <div className="text-right">
-                        <div className="text-xl font-light text-gray-900 tracking-tight mb-1" style={{
-                          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif'
-                        }}>
-                          {formatTime(timer.totalSeconds)}
-                        </div>
-                        <div className="text-xs text-gray-500 font-medium bg-gray-50 px-2 py-0.5 rounded-full">
-                          {formatHours(timer.totalSeconds)} hours
+                        
+                        {/* Time Display */}
+                        <div className="flex items-center gap-2">
+                          <div className="text-lg font-light text-gray-900 tracking-tight" style={{
+                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif'
+                          }}>
+                            {formatHumanReadableTime(timer.totalSeconds)}
+                          </div>
+                          <div className="text-xs text-gray-500 font-medium bg-gray-50 px-2 py-0.5 rounded-full">
+                            {formatHours(timer.totalSeconds)} hours
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -222,28 +274,6 @@ const PausedTimers: React.FC<PausedTimersProps> = ({
                       >
                         <Square className="w-4 h-4" />
                         Stop & Log
-                      </motion.button>
-
-                      <motion.button
-                        onClick={() => onDiscard(timer.id)}
-                        className="h-10 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300"
-                        style={{
-                          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif',
-                          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
-                          border: '1px solid rgba(0, 0, 0, 0.08)',
-                          color: '#6b7280',
-                          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
-                        }}
-                        whileHover={{ 
-                          scale: 1.02,
-                          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
-                        }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        Discard
                       </motion.button>
                     </div>
                   </div>
