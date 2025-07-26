@@ -114,10 +114,13 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   const handlePinToggle = (subprojectName: string, projectId: string, projectName: string) => {
     const id = `${projectId}-${subprojectName}`;
     setPinnedSubprojects(prev => {
-      if (prev.some(item => item.id === id)) {
-        return prev.filter(item => item.id !== id);
+      // Filter out any undefined items first
+      const cleanPrev = prev.filter(item => item && item.id);
+      
+      if (cleanPrev.some(item => item.id === id)) {
+        return cleanPrev.filter(item => item.id !== id);
       } else {
-        return [...prev, { id, name: subprojectName, projectId: projectId, projectName: projectName }];
+        return [...cleanPrev, { id, name: subprojectName, projectId: projectId, projectName: projectName }];
       }
     });
   };
@@ -194,7 +197,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   const filteredSubprojects = selectedProject
     ? selectedProject.subprojects
       .filter(sub => sub.toLowerCase().includes(subprojectSearchQuery.toLowerCase()) &&
-        !pinnedSubprojects.some(pinned => pinned.name === sub && pinned.projectId === selectedProject.id))
+        !pinnedSubprojects.some(pinned => pinned && pinned.name === sub && pinned.projectId === selectedProject.id))
       .sort((a, b) => {
         const aFreq = subprojectFrequency[selectedProject.id]?.[a] || 0;
         const bFreq = subprojectFrequency[selectedProject.id]?.[b] || 0;
@@ -847,13 +850,13 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
               </div>
 
               {/* Pinned Subprojects Section */}
-              {pinnedSubprojects.length > 0 && (
+              {pinnedSubprojects.filter(item => item && item.id).length > 0 && (
                 <div className="mb-4 pb-4 border-b border-gray-200">
                   <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">Pinned</h4>
                   <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                    <SortableContext items={pinnedSubprojects.map(item => item.id)} strategy={verticalListSortingStrategy}>
+                    <SortableContext items={pinnedSubprojects.filter(item => item).map(item => item.id)} strategy={verticalListSortingStrategy}>
                       <div className="space-y-2 subproject-list-container">
-                        {pinnedSubprojects.map((item) => (
+                        {pinnedSubprojects.filter(item => item).map((item) => (
                           <SortableItem key={item.id} id={item.id}>
                             <button
                               className="w-full p-4 text-left bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 transition-all duration-200 border border-gray-200 subproject-item"
@@ -869,11 +872,19 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                               <div className="flex items-center justify-between w-full">
                                 <div className="text-base font-medium text-slate-800">{item.name}</div>
                                 <button
-                                  onClick={(e) => {
+                                  onMouseDown={(e) => {
                                     e.stopPropagation();
+                                    e.preventDefault();
                                     handlePinToggle(item.name, item.projectId, item.projectName);
                                   }}
-                                  className="ml-2 text-gray-400 hover:text-purple-600 transition-colors"
+                                  onTouchStart={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    handlePinToggle(item.name, item.projectId, item.projectName);
+                                  }}
+                                  className="ml-2 text-purple-600 hover:text-purple-800 transition-colors"
+                                  title="Unpin this item"
+                                  style={{ pointerEvents: 'auto' }}
                                 >
                                   <Pin className="w-4 h-4 fill-current" />
                                 </button>
@@ -889,7 +900,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
               <div className="space-y-2 subproject-list-container">
                 {filteredSubprojects.map((subproject, index) => {
-                  const isPinned = pinnedSubprojects.some(item => item.name === subproject && item.projectId === selectedProject?.id);
+                  const isPinned = pinnedSubprojects.some(item => item && item.name === subproject && item.projectId === selectedProject?.id);
                   return (
                     <button
                       key={index}
@@ -911,9 +922,10 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                               handlePinToggle(subproject, selectedProject.id, selectedProject.name);
                             }
                           }}
-                          className="ml-2 text-gray-400 hover:text-purple-600 transition-colors"
+                          className={`ml-2 transition-colors ${isPinned ? 'text-purple-600 hover:text-purple-800' : 'text-gray-400 hover:text-purple-600'}`}
+                          title={isPinned ? 'Unpin this item' : 'Pin this item'}
                         >
-                          <Pin className={`w-4 h-4 ${isPinned ? 'fill-purple-600' : ''}`} />
+                          <Pin className={`w-4 h-4 ${isPinned ? 'fill-current' : ''}`} />
                         </button>
                       </div>
                     </button>
