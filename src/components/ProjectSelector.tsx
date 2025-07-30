@@ -328,11 +328,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   };
 
   // Determine placeholder based on state
-  const placeholder = selectedProject
-    ? "Select a task..."
-    : activeTab === 'frequent'
-      ? "Search and select project..."
-      : "Search QuickStart templates...";
+  const placeholder = "";
 
   return (
     <div className="w-1/2 backdrop-blur-2xl border border-white/30 shadow-lg rounded-2xl h-[612px] overflow-hidden project-selector-container" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
@@ -343,11 +339,11 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
           background: '#faf9fe'
         }}
       >
-        <div className="flex items-center gap-5">
-          {/* New Apple-Style Search Bar */}
+        <div className="flex items-center justify-between w-full">
+          {/* Reduced Width Search Bar */}
           <div
             ref={searchContainerRef}
-            className={`w-full flex items-center bg-white rounded-2xl border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] search-container ${isSearchFocused ? 'focused' : ''} ${isDropdownOpen ? 'dropdown-open' : ''}`}
+            className={`flex-1 max-w-md flex items-center bg-white rounded-2xl border border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] search-container ${isSearchFocused ? 'focused' : ''} ${isDropdownOpen ? 'dropdown-open' : ''}`}
             style={{
               transition: 'box-shadow 0.2s ease',
               WebkitTapHighlightColor: 'transparent',
@@ -452,41 +448,44 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                 autoComplete="off"
                 disabled={isTimerRunning}
               />
-              <div className="flex items-center ml-3 pl-3 border-l border-gray-200"
-                style={{ transition: 'opacity 0.2s ease, visibility 0.2s ease' }}>
-                <button
-                  className={`px-4 py-2 text-sm font-semibold transition-all duration-200 relative tab-button ${activeTab === 'frequent' ? 'text-purple-600' : 'text-gray-500 hover:text-purple-500'
-                    }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveTab('frequent');
-                  }}
-                >
-                  Frequently Used
-                  {activeTab === 'frequent' && (
-                    <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-purple-400 to-purple-600 rounded-t-full tab-indicator" />
-                  )}
-                </button>
-                <button
-                  className={`px-4 py-2 text-sm font-semibold transition-all duration-200 relative ml-2 tab-button ${activeTab === 'quick' ? 'text-purple-600' : 'text-gray-500 hover:text-purple-500'
-                    }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveTab('quick');
-                  }}
-                >
-                  QuickStart
-                  {activeTab === 'quick' && (
-                    <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-purple-400 to-purple-600 rounded-t-full tab-indicator" />
-                  )}
-                </button>
-              </div>
             </div>
           </div>
 
-          {/* Standard Project Dropdown */}
+          {/* Tab Navigation with Equal Spacing */}
+          <div className={`flex items-center gap-8 ml-8 transition-opacity duration-300 ${isDropdownOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+            <button
+              className={`px-6 py-2 text-sm font-semibold transition-all duration-200 relative tab-button ${activeTab === 'frequent' ? 'text-purple-600' : 'text-gray-500 hover:text-purple-500'
+                }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveTab('frequent');
+              }}
+            >
+              Frequently Used
+              {activeTab === 'frequent' && (
+                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-purple-400 to-purple-600 rounded-t-full tab-indicator" />
+              )}
+            </button>
+            <button
+              className={`px-6 py-2 text-sm font-semibold transition-all duration-200 relative tab-button ${activeTab === 'quick' ? 'text-purple-600' : 'text-gray-500 hover:text-purple-500'
+                }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveTab('quick');
+              }}
+            >
+              QuickStart
+              {activeTab === 'quick' && (
+                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-purple-400 to-purple-600 rounded-t-full tab-indicator" />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Standard Project Dropdown */}
           {!selectedProject && showProjectDropdown && (
-            <div className={`absolute top-full left-6 right-6 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 z-50 unified-dropdown ${isDropdownOpen ? 'dropdown-fullscreen' : ''}`}>
+            <div className={`absolute top-full left-6 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 z-50 unified-dropdown ${isDropdownOpen ? 'dropdown-fullscreen' : ''}`} style={{ width: 'calc(100% - 3rem)', maxWidth: '400px' }}>
               <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-2">
                 {filteredProjects.map((project, index) => (
                   <div
@@ -516,7 +515,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
           {/* Subproject Dropdown */}
           {selectedProject && !selectedSubproject && showSubprojectDropdown && (
-            <div className={`absolute top-full left-6 right-6 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 z-50 unified-dropdown ${isDropdownOpen ? 'dropdown-fullscreen' : ''}`}>
+            <div className={`absolute top-full left-6 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 z-50 unified-dropdown ${isDropdownOpen ? 'dropdown-fullscreen' : ''}`} style={{ width: 'calc(100% - 3rem)', maxWidth: '400px' }}>
               <div className="max-h-[calc(100vh-200px)] overflow-y-auto py-2">
                 {filteredSubprojects.map((subproject, index) => {
                   return (
@@ -545,8 +544,6 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
               </div>
             </div>
           )}
-        </div>
-      </div>
 
       {/* Premium Content Section */}
       <div className="h-full flex flex-col">

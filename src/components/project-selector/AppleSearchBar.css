@@ -64,6 +64,7 @@ input:focus {
   bottom: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
+  max-width: none !important;
   border-radius: 0 !important;
   border: none !important;
   box-shadow: none !important;
