@@ -689,4 +689,44 @@ button.bg-white.rounded-xl.shadow-sm:hover {
 /* Ensure no tab-indicator styles apply to pinned buttons */
 .pinned-subproject-button .tab-indicator {
   display: none !important;
+}/* Edit 
+Button Styles */
+.edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  opacity: 0.4; /* 60% dimmed */
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+}
+
+.edit-btn:hover {
+  opacity: 1; /* Full color */
+  background: rgba(139, 92, 246, 0.2);
+  transform: scale(1.02);
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1.02);
+    background: rgba(139, 92, 246, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    background: rgba(139, 92, 246, 0.25);
+  }
+}
+
+.tabs-container:hover .edit-btn {
+  animation: pulse 2s infinite;
 }

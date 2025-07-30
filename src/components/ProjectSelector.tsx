@@ -366,7 +366,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
             }}
           >
             <div className={`px-4 py-3 flex items-center w-full ${isDropdownOpen ? 'pt-8 pb-6' : ''}`}>
-              <Search className={`w-5 h-5 text-gray-400 flex-shrink-0 ${searchIconAnimate ? 'search-icon-animate' : ''}`} />
+              <Search className={`w-5 h-5 flex-shrink-0 ${searchIconAnimate ? 'search-icon-animate' : ''}`} style={{ color: '#7e22ce' }} />
               {isDropdownOpen && (
                 <button
                   className="close-button"
@@ -452,9 +452,9 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
           </div>
 
           {/* Tab Navigation with Equal Spacing */}
-          <div className={`flex items-center gap-8 ml-8 transition-opacity duration-300 ${isDropdownOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          <div className={`flex items-center gap-3 ml-4 transition-opacity duration-300 tabs-container ${isDropdownOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
             <button
-              className={`px-6 py-2 text-sm font-semibold transition-all duration-200 relative tab-button ${activeTab === 'frequent' ? 'text-purple-600' : 'text-gray-500 hover:text-purple-500'
+              className={`px-5 py-2 text-sm font-semibold transition-all duration-200 relative tab-button ${activeTab === 'frequent' ? 'text-purple-600' : 'text-gray-500 hover:text-purple-500'
                 }`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -467,7 +467,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
               )}
             </button>
             <button
-              className={`px-6 py-2 text-sm font-semibold transition-all duration-200 relative tab-button ${activeTab === 'quick' ? 'text-purple-600' : 'text-gray-500 hover:text-purple-500'
+              className={`px-5 py-2 text-sm font-semibold transition-all duration-200 relative tab-button ${activeTab === 'quick' ? 'text-purple-600' : 'text-gray-500 hover:text-purple-500'
                 }`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -478,6 +478,19 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
               {activeTab === 'quick' && (
                 <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-purple-400 to-purple-600 rounded-t-full tab-indicator" />
               )}
+            </button>
+            <button
+              className="edit-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                // Add edit functionality here
+                console.log('Edit button clicked');
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
             </button>
           </div>
         </div>
