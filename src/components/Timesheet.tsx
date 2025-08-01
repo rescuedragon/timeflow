@@ -480,7 +480,16 @@ const ProgressBar = ({
 
       <div className="absolute top-4 left-4 z-20">
         <button
-          className="bg-gray-900/90 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-800/50 shadow-md hover:bg-gray-800/90 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="backdrop-blur-sm rounded-xl px-4 py-3 shadow-md transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.9) 0%, rgba(34, 99, 235, 0.9) 100%)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(147, 51, 234, 1) 0%, rgba(34, 99, 235, 1) 100%)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(147, 51, 234, 0.9) 0%, rgba(34, 99, 235, 0.9) 100%)';
+          }}
           disabled={false}
           onClick={() => {
             const allTypes = [
@@ -770,152 +779,206 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Progress Bar - Full Width */}
-      <div className="w-full mb-8">
-        <div className="max-w-7xl mx-auto px-8">
+    <div className="h-full flex flex-col animate-fade-up max-w-6xl mx-auto p-4">
+      {/* Premium Progress Bar Section */}
+      <div className="relative mb-8">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-blue-600/20 rounded-3xl blur-xl"></div>
+        <div className="relative">
           <ProgressBar
             currentHours={totalHours * 3600}
             enabled={true}
             color="#0EA5E9"
-            className="rounded-3xl shadow-xl border-0"
+            className="rounded-3xl shadow-2xl border-0"
           />
         </div>
       </div>
 
-      {/* Single Container with Toggle and Content */}
-      <div className="w-full">
-        <div className="max-w-7xl mx-auto px-8">
-          <Card className="p-8 bg-white/80 backdrop-blur-xl border-0 shadow-xl rounded-3xl">
-            {/* View Toggle */}
-            <div className="flex bg-slate-100/80 rounded-2xl p-1 mb-8">
+      {/* Single Merged Container */}
+      <Card className="flex-1 bg-white/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden">
+        <div className="p-8">
+          {/* Premium View Toggle */}
+          <div className="flex bg-gradient-to-r from-slate-100/80 to-slate-50/80 rounded-2xl p-2 mb-8 shadow-inner border border-slate-200/50">
+            <Button
+              variant={viewMode === 'weekly' ? 'default' : 'ghost'}
+              onClick={() => setViewMode('weekly')}
+              className={`flex-1 rounded-2xl font-semibold transition-all duration-300 ${viewMode === 'weekly'
+                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg hover:shadow-xl hover:scale-[1.02]'
+                : 'text-slate-600 hover:bg-white/80 hover:shadow-md'
+                }`}
+            >
+              <BarChart3 className="w-5 h-5 mr-2" />
+              Weekly View
+            </Button>
+            <Button
+              variant={viewMode === 'daily' ? 'default' : 'ghost'}
+              onClick={() => setViewMode('daily')}
+              className={`flex-1 rounded-2xl font-semibold transition-all duration-300 ${viewMode === 'daily'
+                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg hover:shadow-xl hover:scale-[1.02]'
+                : 'text-slate-600 hover:bg-white/80 hover:shadow-md'
+                }`}
+            >
+              <Calendar className="w-5 h-5 mr-2" />
+              Daily View
+            </Button>
+          </div>
+
+          {/* Enhanced Date Navigation */}
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+              {viewMode === 'daily' ? 'Daily Timesheet' : 'Weekly Summary'}
+            </h3>
+
+            <div className="flex items-center gap-4">
               <Button
-                variant={viewMode === 'daily' ? 'default' : 'ghost'}
-                onClick={() => setViewMode('daily')}
-                className={`flex-1 rounded-xl font-medium font-system transition-all duration-300 ${viewMode === 'daily'
-                  ? 'bg-white shadow-lg text-purple-600'
-                  : 'text-slate-600 hover:bg-white/50'
-                  }`}
+                variant="ghost"
+                size="sm"
+                onClick={() => navigateDate('prev')}
+                className="w-12 h-12 rounded-2xl bg-slate-100/80 hover:bg-slate-200/80 border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
               >
-                <Calendar className="w-4 h-4 mr-2" />
-                Daily View
+                <ChevronLeft className="w-5 h-5 text-slate-700" />
               </Button>
-              <Button
-                variant={viewMode === 'weekly' ? 'default' : 'ghost'}
-                onClick={() => setViewMode('weekly')}
-                className={`flex-1 rounded-xl font-medium font-system transition-all duration-300 ${viewMode === 'weekly'
-                  ? 'bg-white shadow-lg text-purple-600'
-                  : 'text-slate-600 hover:bg-white/50'
-                  }`}
-              >
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Weekly View
-              </Button>
-            </div>
 
-            {/* Date Navigation */}
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-slate-700 font-display">
-                {viewMode === 'daily' ? 'Daily Timesheet' : 'Weekly Summary'}
-              </h2>
-
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigateDate('prev')}
-                  className="w-10 h-10 rounded-xl bg-white/70 hover:bg-white/90 font-system"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-
-                <div className="text-center min-w-[200px]">
-                  <div className="font-semibold text-slate-700 font-system">
-                    {viewMode === 'daily' ? formatDate(currentDate) :
-                      `Week of ${formatDate(new Date(currentDate.getTime() - currentDate.getDay() * 24 * 60 * 60 * 1000))}`}
-                  </div>
-                  {isToday(currentDate) && viewMode === 'daily' && (
-                    <Badge variant="secondary" className="mt-1 bg-emerald-100 text-emerald-700 font-system">
-                      Today
-                    </Badge>
-                  )}
+              <div className="text-center min-w-[280px] p-4 bg-gradient-to-r from-slate-50/80 to-slate-100/80 rounded-2xl border border-slate-200/50">
+                <div className="font-bold text-lg text-slate-800">
+                  {viewMode === 'daily' ? formatDate(currentDate) :
+                    `Week of ${formatDate(new Date(currentDate.getTime() - currentDate.getDay() * 24 * 60 * 60 * 1000))}`}
                 </div>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigateDate('next')}
-                  className="w-10 h-10 rounded-xl bg-white/70 hover:bg-white/90 font-system"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
+                {isToday(currentDate) && viewMode === 'daily' && (
+                  <Badge className="mt-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-md">
+                    Today
+                  </Badge>
+                )}
               </div>
-            </div>
 
-            {/* Time Entries Content */}
-            <div className="overflow-y-auto max-h-96">
-              {viewMode === 'daily' ? (
-                <div className="space-y-3">
-                  {getDayEntries().length === 0 ? (
-                    <div className="text-center py-12 text-slate-500">
-                      <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-lg mb-2 font-system">No time entries for this day</p>
-                      <p className="text-sm font-system">Start tracking time to see entries here</p>
-                    </div>
-                  ) : (
-                    getDayEntries().map((entry) => (
-                      <Card key={entry.id} className="p-4 hover-lift bg-white/70 rounded-2xl">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-system">
-                                {entry.project}
-                              </Badge>
-                              <Badge variant="secondary" className="bg-slate-100 text-slate-600 font-system">
-                                {entry.subproject}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center gap-4 text-sm text-slate-600 font-system">
-                              <span className="font-mono">{entry.startTime} - {entry.endTime}</span>
-                              <span className="font-semibold text-purple-600 font-mono">{entry.totalTime}</span>
-                            </div>
-                            {entry.description && (
-                              <p className="text-sm text-slate-500 mt-2 font-system">{entry.description}</p>
-                            )}
-                          </div>
-                        </div>
-                      </Card>
-                    ))
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {aggregateWeeklyData().length === 0 ? (
-                    <div className="text-center py-12 text-slate-500">
-                      <BarChart3 className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-lg mb-2 font-system">No time entries for this week</p>
-                      <p className="text-sm font-system">Start tracking time to see weekly summary</p>
-                    </div>
-                  ) : (
-                    aggregateWeeklyData().map((item, index) => (
-                      <Card key={index} className="p-4 hover-lift bg-white/70 rounded-2xl">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-slate-700 mb-1 font-display">{item.project}</h4>
-                            <div className="text-sm text-slate-600 font-system">
-                              <span className="font-semibold text-purple-600 font-mono">{item.totalTime}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    ))
-                  )}
-                </div>
-              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigateDate('next')}
+                className="w-12 h-12 rounded-2xl bg-slate-100/80 hover:bg-slate-200/80 border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+              >
+                <ChevronRight className="w-5 h-5 text-slate-700" />
+              </Button>
             </div>
-          </Card>
+          </div>
+
+          {/* Enhanced Time Entries Content */}
+          <div className="overflow-y-auto max-h-96 pr-2">
+            {viewMode === 'daily' ? (
+              <div className="space-y-4">
+                {getDayEntries().length === 0 ? (
+                  <div className="text-center py-16 bg-gradient-to-br from-slate-50/80 to-slate-100/80 rounded-2xl border border-slate-200/50">
+                    <div className="p-4 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                      <Clock className="w-10 h-10 text-slate-500" />
+                    </div>
+                    <p className="text-xl font-bold text-slate-700 mb-2">No time entries for this day</p>
+                    <p className="text-slate-500 font-medium">Start tracking time to see entries here</p>
+                  </div>
+                ) : (
+                  getDayEntries().map((entry) => (
+                    <Card key={entry.id} className="p-6 bg-white/80 backdrop-blur-sm border border-slate-200/50 rounded-2xl hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Badge className="bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 border-purple-200/50 font-semibold px-3 py-1">
+                              {entry.project}
+                            </Badge>
+                            <Badge className="bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 border-slate-300/50 font-semibold px-3 py-1">
+                              {entry.subproject}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-6 text-sm text-slate-600 mb-2">
+                            <span className="font-mono bg-slate-100 px-3 py-1 rounded-xl">{entry.startTime} - {entry.endTime}</span>
+                            <span className="font-bold text-lg bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent font-mono">{entry.totalTime}</span>
+                          </div>
+                          {entry.description && (
+                            <p className="text-slate-600 mt-3 p-3 bg-slate-50/80 rounded-xl border border-slate-200/50">{entry.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  ))
+                )}
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Weekly Calendar Grid */}
+                <div className="grid grid-cols-7 gap-4">
+                  {(() => {
+                    const startOfWeek = new Date(currentDate);
+                    // Calculate Monday as start of week
+                    const dayOfWeek = startOfWeek.getDay();
+                    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // If Sunday (0), go back 6 days, otherwise go to Monday
+                    startOfWeek.setDate(currentDate.getDate() + mondayOffset);
+                    
+                    const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    const days = [];
+                    
+                    for (let i = 0; i < 7; i++) {
+                      const day = new Date(startOfWeek);
+                      day.setDate(startOfWeek.getDate() + i);
+                      
+                      // Calculate hours for this day
+                      const dayEntries = timeEntries.filter(entry => entry.date === day.toDateString());
+                      let totalMinutes = 0;
+                      dayEntries.forEach(entry => {
+                        const [hours, minutes] = entry.totalTime.split(':').map(Number);
+                        totalMinutes += hours * 60 + minutes;
+                      });
+                      const dayHours = (totalMinutes / 60).toFixed(1);
+                      
+                      const isToday = day.toDateString() === new Date().toDateString();
+                      const isWeekend = i === 5 || i === 6; // Saturday (5) or Sunday (6)
+                      
+                      days.push(
+                        <Card 
+                          key={i} 
+                          className={`p-4 backdrop-blur-sm border rounded-2xl hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer ${
+                            isWeekend 
+                              ? 'bg-slate-100/60 border-slate-300/30 opacity-60' 
+                              : 'bg-white/80 border-slate-200/50'
+                          } ${
+                            isToday && !isWeekend ? 'ring-2 ring-blue-400/50 bg-gradient-to-br from-blue-50/80 to-purple-50/80' : ''
+                          }`}
+                        >
+                          <div className="text-center">
+                            <div className={`text-sm font-semibold mb-1 ${
+                              isWeekend ? 'text-slate-400' : 'text-slate-600'
+                            }`}>
+                              {weekDays[i]}
+                            </div>
+                            <div className={`text-2xl font-bold mb-2 ${
+                              isToday && !isWeekend ? 'text-blue-600' : 
+                              isWeekend ? 'text-slate-400' : 'text-slate-800'
+                            }`}>
+                              {day.getDate()}
+                            </div>
+                            <div className={`text-xs mb-3 ${
+                              isWeekend ? 'text-slate-400' : 'text-slate-500'
+                            }`}>
+                              {day.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                            </div>
+                            <div className={`text-sm font-bold ${
+                              isWeekend 
+                                ? 'text-slate-400'
+                                : parseFloat(dayHours) > 0 
+                                  ? 'bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent' 
+                                  : 'text-slate-400'
+                            }`}>
+                              {dayHours} hours
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    }
+                    
+                    return days;
+                  })()}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
