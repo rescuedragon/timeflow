@@ -781,7 +781,7 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
   return (
     <div className="h-full flex flex-col animate-fade-up max-w-6xl mx-auto p-4">
       {/* Premium Progress Bar Section */}
-      <div className="relative mb-8">
+      <div className="relative mb-4">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-blue-600/20 rounded-3xl blur-xl"></div>
         <div className="relative">
           <ProgressBar
@@ -794,57 +794,85 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
       </div>
 
       {/* Single Merged Container */}
-      <Card className="flex-1 bg-white/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden">
+      <Card className="flex-1 bg-white/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden min-h-[120%]">
         <div className="p-8">
           {/* Premium View Toggle */}
-          <div className="flex bg-gradient-to-r from-slate-100/80 to-slate-50/80 rounded-2xl p-2 mb-8 shadow-inner border border-slate-200/50">
+          <div className="flex bg-gradient-to-r from-slate-100/80 to-slate-50/80 rounded-xl p-1.5 mb-6 shadow-sm border border-slate-200/50">
             <Button
               variant={viewMode === 'weekly' ? 'default' : 'ghost'}
               onClick={() => setViewMode('weekly')}
-              className={`flex-1 rounded-2xl font-semibold transition-all duration-300 ${viewMode === 'weekly'
-                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg hover:shadow-xl hover:scale-[1.02]'
-                : 'text-slate-600 hover:bg-white/80 hover:shadow-md'
+              className={`flex-1 rounded-lg font-semibold py-2.5 px-4 transition-all duration-300 ${viewMode === 'weekly'
+                ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-md hover:shadow-lg hover:from-purple-600 hover:to-blue-600'
+                : 'text-slate-600 hover:bg-white/80 hover:shadow-sm hover:text-slate-700'
                 }`}
             >
-              <BarChart3 className="w-5 h-5 mr-2" />
+              <BarChart3 className="w-4 h-4 mr-2" />
               Weekly View
             </Button>
             <Button
               variant={viewMode === 'daily' ? 'default' : 'ghost'}
               onClick={() => setViewMode('daily')}
-              className={`flex-1 rounded-2xl font-semibold transition-all duration-300 ${viewMode === 'daily'
-                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg hover:shadow-xl hover:scale-[1.02]'
-                : 'text-slate-600 hover:bg-white/80 hover:shadow-md'
+              className={`flex-1 rounded-lg font-semibold py-2.5 px-4 transition-all duration-300 ${viewMode === 'daily'
+                ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-md hover:shadow-lg hover:from-purple-600 hover:to-blue-600'
+                : 'text-slate-600 hover:bg-white/80 hover:shadow-sm hover:text-slate-700'
                 }`}
             >
-              <Calendar className="w-5 h-5 mr-2" />
+              <Calendar className="w-4 h-4 mr-2" />
               Daily View
             </Button>
           </div>
 
           {/* Enhanced Date Navigation */}
-          <div className="flex justify-between items-center mb-8">
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              {viewMode === 'daily' ? 'Daily Timesheet' : 'Weekly Summary'}
-            </h3>
-
+          <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-4">
+              <h3 className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                {viewMode === 'daily' ? 'Daily Timesheet' : 'Weekly Summary'}
+              </h3>
+              {viewMode === 'weekly' && (() => {
+                const startOfWeek = new Date(currentDate);
+                const dayOfWeek = startOfWeek.getDay();
+                const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                startOfWeek.setDate(currentDate.getDate() + mondayOffset);
+                
+                let totalWeekMinutes = 0;
+                for (let i = 0; i < 7; i++) {
+                  const day = new Date(startOfWeek);
+                  day.setDate(startOfWeek.getDate() + i);
+                  const dayEntries = timeEntries.filter(entry => entry.date === day.toDateString());
+                  dayEntries.forEach(entry => {
+                    const [hours, minutes] = entry.totalTime.split(':').map(Number);
+                    totalWeekMinutes += hours * 60 + minutes;
+                  });
+                }
+                const totalWeekHours = (totalWeekMinutes / 60).toFixed(1);
+                
+                return (
+                  <div className="text-sm text-slate-600">
+                    Hours this week: <span className="font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                      {totalWeekHours} hours
+                    </span>
+                  </div>
+                );
+              })()}
+            </div>
+
+            <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigateDate('prev')}
-                className="w-12 h-12 rounded-2xl bg-slate-100/80 hover:bg-slate-200/80 border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                className="w-10 h-10 rounded-lg bg-slate-100/80 hover:bg-slate-200/80 border-0 shadow-sm hover:shadow-md transition-all duration-300"
               >
-                <ChevronLeft className="w-5 h-5 text-slate-700" />
+                <ChevronLeft className="w-4 h-4 text-slate-700" />
               </Button>
 
-              <div className="text-center min-w-[280px] p-4 bg-gradient-to-r from-slate-50/80 to-slate-100/80 rounded-2xl border border-slate-200/50">
-                <div className="font-bold text-lg text-slate-800">
+              <div className="text-center min-w-[240px] py-2 px-4 bg-gradient-to-r from-slate-50/80 to-slate-100/80 rounded-lg border border-slate-200/50">
+                <div className="font-semibold text-base text-slate-800">
                   {viewMode === 'daily' ? formatDate(currentDate) :
-                    `Week of ${formatDate(new Date(currentDate.getTime() - currentDate.getDay() * 24 * 60 * 60 * 1000))}`}
+                    `Week of ${formatDate(new Date(currentDate.getTime() - (currentDate.getDay() === 0 ? 6 : currentDate.getDay() - 1) * 24 * 60 * 60 * 1000))}`}
                 </div>
                 {isToday(currentDate) && viewMode === 'daily' && (
-                  <Badge className="mt-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-md">
+                  <Badge className="mt-1 bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-sm text-xs">
                     Today
                   </Badge>
                 )}
@@ -854,15 +882,15 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigateDate('next')}
-                className="w-12 h-12 rounded-2xl bg-slate-100/80 hover:bg-slate-200/80 border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                className="w-10 h-10 rounded-lg bg-slate-100/80 hover:bg-slate-200/80 border-0 shadow-sm hover:shadow-md transition-all duration-300"
               >
-                <ChevronRight className="w-5 h-5 text-slate-700" />
+                <ChevronRight className="w-4 h-4 text-slate-700" />
               </Button>
             </div>
           </div>
 
           {/* Enhanced Time Entries Content */}
-          <div className="overflow-y-auto max-h-96 pr-2">
+          <div>
             {viewMode === 'daily' ? (
               <div className="space-y-4">
                 {getDayEntries().length === 0 ? (
@@ -900,9 +928,9 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
                 )}
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {/* Weekly Calendar Grid */}
-                <div className="grid grid-cols-7 gap-4">
+                <div className="grid grid-cols-7 gap-x-4 gap-y-3">
                   {(() => {
                     const startOfWeek = new Date(currentDate);
                     // Calculate Monday as start of week
@@ -932,39 +960,39 @@ const Timesheet: React.FC<TimesheetProps> = ({ timeEntries }) => {
                       days.push(
                         <Card 
                           key={i} 
-                          className={`p-4 backdrop-blur-sm border rounded-2xl hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer ${
+                          className={`py-3 px-2 backdrop-blur-sm border rounded-lg shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 cursor-pointer ${
                             isWeekend 
-                              ? 'bg-slate-100/60 border-slate-300/30 opacity-60' 
-                              : 'bg-white/80 border-slate-200/50'
+                              ? 'bg-slate-100/40 border-slate-300/30 opacity-60' 
+                              : 'bg-slate-50/10 border-slate-200/50'
                           } ${
-                            isToday && !isWeekend ? 'ring-2 ring-blue-400/50 bg-gradient-to-br from-blue-50/80 to-purple-50/80' : ''
+                            isToday && !isWeekend ? 'ring-2 ring-blue-400/50 bg-gradient-to-br from-blue-50/60 to-purple-50/60' : ''
                           }`}
                         >
                           <div className="text-center">
-                            <div className={`text-sm font-semibold mb-1 ${
+                            <div className={`text-base font-medium mb-1 ${
                               isWeekend ? 'text-slate-400' : 'text-slate-600'
                             }`}>
                               {weekDays[i]}
                             </div>
-                            <div className={`text-2xl font-bold mb-2 ${
+                            <div className={`text-xl font-bold mb-1 ${
                               isToday && !isWeekend ? 'text-blue-600' : 
                               isWeekend ? 'text-slate-400' : 'text-slate-800'
                             }`}>
                               {day.getDate()}
                             </div>
-                            <div className={`text-xs mb-3 ${
+                            <div className={`text-xs mb-2 ${
                               isWeekend ? 'text-slate-400' : 'text-slate-500'
                             }`}>
                               {day.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                             </div>
-                            <div className={`text-sm font-bold ${
+                            <div className={`text-sm font-medium ${
                               isWeekend 
                                 ? 'text-slate-400'
                                 : parseFloat(dayHours) > 0 
                                   ? 'bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent' 
                                   : 'text-slate-400'
                             }`}>
-                              {dayHours} hours
+                              {dayHours}h
                             </div>
                           </div>
                         </Card>
